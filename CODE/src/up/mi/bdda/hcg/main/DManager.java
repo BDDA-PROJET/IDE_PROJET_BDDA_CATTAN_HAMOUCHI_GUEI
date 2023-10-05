@@ -64,7 +64,7 @@ public class DManager implements DiskManager {
 	@Override
 	public int getCurrentCountAllocPages() {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getCurrentCountAllocPages'");
+		return pageIdHistory.size();
 	}
 
 
