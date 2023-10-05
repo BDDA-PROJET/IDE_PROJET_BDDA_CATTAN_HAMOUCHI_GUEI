@@ -2,6 +2,7 @@ package up.mi.bdda.hcg.main;
 
 import up.mi.bdda.hcg.api.DiskManager;
 
+
 /**
  * Cette classe regroupe les paramètres de notre application.
  */
@@ -22,7 +23,7 @@ public class DBParams {
 		SGBDPageSize = 4096;
 		DMFFileCount = 4;
 
-		DiskManager disk = new DManager();
+		DiskManager disk = DManager.getSingleton();
 	}
 
 }

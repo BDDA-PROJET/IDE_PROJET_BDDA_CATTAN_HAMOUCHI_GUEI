@@ -14,12 +14,14 @@ public class DManager implements DiskManager {
 	private ByteBuffer buffer;
 	private Set<Float> pageIdHistory;
 	private PageId currentPageId;
+	private static DiskManager gSingleton = new DiskManager();
 
-	public DManager() {
+	private DManager() {
 		buffer = ByteBuffer.allocate(DBParams.SGBDPageSize);
 		pageIdHistory = new HashSet<>();
 		currentPageId = new PageId();
 	}
+
 
 	private void createFile() {
 		Path path = Paths.get(DBParams.DBPath, "F" + 0 + ".data");
@@ -63,5 +65,10 @@ public class DManager implements DiskManager {
 	public int getCurrentCountAllocPages() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException("Unimplemented method 'getCurrentCountAllocPages'");
+	}
+
+
+	public static DiskManager getSingleton(){
+		return gSingleton;
 	}
 }
