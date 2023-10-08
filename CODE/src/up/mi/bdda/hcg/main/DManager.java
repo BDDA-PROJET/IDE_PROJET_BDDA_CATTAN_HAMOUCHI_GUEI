@@ -14,14 +14,13 @@ public class DManager implements DiskManager {
 	private ByteBuffer buffer;
 	private Set<Float> pageIdHistory;
 	private PageId currentPageId;
-	private static DiskManager gSingleton = new DiskManager();
+	private static DiskManager gSingleton = new DManager();
 
 	private DManager() {
 		buffer = ByteBuffer.allocate(DBParams.SGBDPageSize);
 		pageIdHistory = new HashSet<>();
 		currentPageId = new PageId();
 	}
-
 
 	private void createFile() {
 		Path path = Paths.get(DBParams.DBPath, "F" + 0 + ".data");
@@ -51,14 +50,13 @@ public class DManager implements DiskManager {
 
 	@Override
 	public void writePage(PageId a, ByteBuffer b) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'writePage'");
+		Files.write(a,b);
 	}
 
 	@Override
 	public void deallocPage(PageId a) {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'deallocPage'");
+		pageIdHistory.remove(Float.parseFloat(a.toString()));
 	}
 
 	@Override
