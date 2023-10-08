@@ -19,17 +19,29 @@ public class PageId {
 		this.pageIdx = pageIdx;
 	}
 
-	public void reset() {
-		fileIdx = 0;
-		pageIdx = 0;
-	}
-
 	public int getFileIdx() {
 		return fileIdx;
 	}
 
 	public int getPageIdx() {
 		return pageIdx;
+	}
+
+	public void setFileIdx(int fileIdx) {
+		this.fileIdx = fileIdx;
+	}
+
+	public void setPageIdx(int pageIdx) {
+		this.pageIdx = pageIdx;
+	}
+
+	public void set(int fileIdx, int pageIdx) {
+		setFileIdx(fileIdx);
+		setPageIdx(pageIdx);
+	}
+
+	public void reset() {
+		set(0, 0);
 	}
 
 	@Override
