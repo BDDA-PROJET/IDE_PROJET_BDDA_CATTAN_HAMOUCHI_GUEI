@@ -2,7 +2,6 @@ package up.mi.bdda.hcg.main;
 
 import up.mi.bdda.hcg.api.DiskManager;
 
-
 /**
  * Cette classe regroupe les paramètres de notre application.
  */
