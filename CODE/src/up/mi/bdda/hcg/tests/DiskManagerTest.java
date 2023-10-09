@@ -29,18 +29,10 @@ public class DiskManagerTest {
 
   @Test
   void testWritePage() {
-    DBParams.DBPath = "DB";
-		DBParams.SGBDPageSize = 4096;
-		DBParams.DMFFileCount = 4;
-    PageId p = new PageId(0,0);
-    ByteBuffer b = new ByteBuffer.allocate(4);
+
+    PageId p = p.allocPage()
+    ByteBuffer b = new ByteBuffer.allocate(SGBDPageSize);
     b.putInt(1);
-    b.putInt(2);
-    b.putInt(3);
-    b.putChar('a');
-    DiskManager disk = DManager.writePage(a,b);
-    
-    
-    
+    DiskManager disk = DManager.writePage(p, b);
   }
 }

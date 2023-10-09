@@ -19,10 +19,8 @@ public class DManager implements DiskManager {
 	private Queue<Float> deallocIdQueue;
 	/** L'identifiant de la prochaine page à allouée. */
 	private PageId currentPageId;
-<<<<<<< HEAD
-=======
+	private static DiskManager gSingleton = new DManager();
 	/** L'unique instance du <code>DiskManager</code>. */
->>>>>>> 678cda6239e3e498899ce895a3782f20d5865fa1
 	private static DiskManager gSingleton = new DManager();
 
 	private DManager() {
@@ -31,12 +29,10 @@ public class DManager implements DiskManager {
 		currentPageId = new PageId(0, 0);
 	}
 
-<<<<<<< HEAD
-=======
 	/**
 	 * Creation d'un fichier à partir du <code>PageId</code>.
 	 */
->>>>>>> 678cda6239e3e498899ce895a3782f20d5865fa1
+
 	private void createFile() {
 		String fileName = "F".concat(String.valueOf(currentPageId.getFileIdx())).concat(".data");
 		Path path = Paths.get(DBParams.DBPath, fileName);
@@ -88,17 +84,6 @@ public class DManager implements DiskManager {
 	public void deallocPage(PageId pageId) {
 		float id = Float.parseFloat(pageId.toString());
 
-<<<<<<< HEAD
-	@Override
-	public void writePage(PageId a, ByteBuffer b) {
-		Files.write(a,b);
-	}
-
-	@Override
-	public void deallocPage(PageId a) {
-		// TODO Auto-generated method stub
-		pageIdHistory.remove(Float.parseFloat(a.toString()));
-=======
 		if (allocIdSet.remove(id))
 			deallocIdQueue.add(id);
 
@@ -106,7 +91,6 @@ public class DManager implements DiskManager {
 			deallocIdQueue.clear();
 			currentPageId.reset();
 		}
->>>>>>> 678cda6239e3e498899ce895a3782f20d5865fa1
 	}
 
 	@Override
@@ -118,11 +102,14 @@ public class DManager implements DiskManager {
 	@Override
 	public void readPage(PageId pageId, ByteBuffer buff) {
 		// TODO Auto-generated method stub
+		pageIdHistory.remove(Float.parseFloat(a.toString()));
 	}
 
 	@Override
 	public void writePage(PageId pageId, ByteBuffer buff) {
-		// TODO Auto-generated method stub
+		String fileName = "F".concat(String.valueOf(currentPageId.getFileIdx())).concat(".data");
+		Path path = Paths.get(DBParams.DBPath, fileName);
+		FIles.write(path , buff.array());
 	}
 
 	/**
