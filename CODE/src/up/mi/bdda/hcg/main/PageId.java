@@ -3,7 +3,7 @@ package up.mi.bdda.hcg.main;
 /**
  * Cette classe associe une page à un fichier.
  */
-public class PageId {
+public class PageId implements Cloneable {
 	/** L’identifiant du fichier. */
 	private int fileIdx;
 
@@ -19,11 +19,6 @@ public class PageId {
 		this.pageIdx = pageIdx;
 	}
 
-	public void reset() {
-		fileIdx = 0;
-		pageIdx = 0;
-	}
-
 	public int getFileIdx() {
 		return fileIdx;
 	}
@@ -32,9 +27,38 @@ public class PageId {
 		return pageIdx;
 	}
 
+	public void setFileIdx(int fileIdx) {
+		this.fileIdx = fileIdx;
+	}
+
+	public void setPageIdx(int pageIdx) {
+		this.pageIdx = pageIdx;
+	}
+
+	public void set(int fileIdx, int pageIdx) {
+		setFileIdx(fileIdx);
+		setPageIdx(pageIdx);
+	}
+
+	public void reset() {
+		set(0, 0);
+	}
+
+	@Override
+	protected PageId clone() {
+		PageId pageId = null;
+
+		try {
+			pageId = (PageId) super.clone();
+		} catch (CloneNotSupportedException cnse) {
+			cnse.printStackTrace(System.err);
+		}
+
+		return pageId;
+	}
+
 	@Override
 	public String toString() {
 		return fileIdx + "." + pageIdx;
 	}
-
 }
