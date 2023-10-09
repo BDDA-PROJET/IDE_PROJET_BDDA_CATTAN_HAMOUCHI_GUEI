@@ -13,19 +13,24 @@ import java.util.Set;
 import up.mi.bdda.hcg.api.DiskManager;
 
 public class DManager implements DiskManager {
-	// private ByteBuffer buffer;
+	/** la liste des pages « <code>allouées</code> ». */
 	private Set<Float> allocIdSet;
+	/** la liste des pages « <code>disponibles</code> ». */
 	private Queue<Float> deallocIdQueue;
+	/** L'identifiant de la prochaine page à allouée. */
 	private PageId currentPageId;
+	/** L'unique instance du <code>DiskManager</code>. */
 	private static DiskManager gSingleton = new DManager();
 
 	private DManager() {
-		// buffer = ByteBuffer.allocate(DBParams.SGBDPageSize);
 		allocIdSet = new HashSet<>();
 		deallocIdQueue = new LinkedList<>();
 		currentPageId = new PageId(0, 0);
 	}
 
+	/**
+	 * Creation d'un fichier à partir du <code>PageId</code>.
+	 */
 	private void createFile() {
 		String fileName = "F".concat(String.valueOf(currentPageId.getFileIdx())).concat(".data");
 		Path path = Paths.get(DBParams.DBPath, fileName);
@@ -39,6 +44,9 @@ public class DManager implements DiskManager {
 		}
 	}
 
+	/**
+	 * Mise à jour du <code>PageId</code> pour la prochaine allocation de page.
+	 */
 	private void next() {
 		int nextFileId = currentPageId.getFileIdx() + 1;
 		int nextPageId = currentPageId.getPageIdx();
@@ -67,8 +75,6 @@ public class DManager implements DiskManager {
 		}
 
 		allocIdSet.add(Float.parseFloat(copy.toString()));
-
-		System.out.println(allocIdSet);
 		return copy;
 	}
 
@@ -116,6 +122,11 @@ public class DManager implements DiskManager {
 		// TODO Auto-generated method stub
 	}
 
+	/**
+	 * Retourne l'unique instance du <code>DiskManager</code>.
+	 * 
+	 * @return le DiskManager
+	 */
 	public static DiskManager getSingleton() {
 		return gSingleton;
 	}
