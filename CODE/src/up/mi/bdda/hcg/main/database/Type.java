@@ -10,26 +10,40 @@ public enum Type {
    */
   FLOAT(4),
   /**
+   * Correspondant à un type char sur 2 octets
+   */
+  CHAR(2),
+  /**
    * Correspondant à une chaîne de caractères de taille (nombre de caractères)
    * exactement T
    */
-  STRING(4),
+  STRING(null),
   /**
    * Correspondant à une chaîne de caractères de taille variable, mais dont la
    * taille maximale (nombre maximal de caractères) est T
    */
-  VARSTRING(20);
+  VARSTRING(null);
 
   /** La taille d'un type de donné. */
-  private final int size;
+  private int size;
 
   /**
    * This is how a constructor is invoked for enum types.
    * 
    * @param size the enum `types` size field
    */
-  private Type(int size) {
+  private Type(Integer size) {
     this.size = size;
+  }
+
+  /**
+   * 
+   * @param value
+   * @return
+   */
+  public Type size(int value) {
+    size = value;
+    return this;
   }
 
   /**

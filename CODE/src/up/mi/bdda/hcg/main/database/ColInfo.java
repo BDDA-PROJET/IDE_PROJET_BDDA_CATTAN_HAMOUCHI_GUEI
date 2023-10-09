@@ -1,15 +1,13 @@
 package up.mi.bdda.hcg.main.database;
 
-import java.util.List;
+import java.util.Objects;
 
-public class ColInfo {
-    private String nomColonnes;
-    private Type typeColonne;
-
-    public ColInfo(String nomColonnes, Type typeColonne){
-        this.nomColonnes = nomColonnes;
-        this.typeColonne = typeColonne;
+/**
+ * Cette classe doit stoker les informations de la colonne de la relation.
+ */
+public record ColInfo(String nomColonnes, Type typeColonne) {
+    public ColInfo {
+        Objects.requireNonNull(nomColonnes);
+        Objects.requireNonNull(typeColonne);
     }
-    
-    
 }

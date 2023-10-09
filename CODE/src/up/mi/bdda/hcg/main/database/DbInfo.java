@@ -2,27 +2,22 @@ package up.mi.bdda.hcg.main.database;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import up.mi.bdda.hcg.api.DatabaseInfo;
 
-public  final class DbInfo implements DatabaseInfo{
-    private int compteurRelation;
+public final class DBInfo implements DatabaseInfo {
+    /** Le compteur de relations. */
+    public static int compteurRelation; // TODO : useless in the meantime.
+    /** La liste de relations. */
     private final Map<String, TableInfo> tablesInfos;
+    /** L'unique instance du {@code DatabaseInfo}. */
+    private static final DatabaseInfo gSingleton = new DBInfo();
 
-    private static final DatabaseInfo gSingleton = new DbInfo();
-
-    private DbInfo(){
+    private DBInfo() {
         tablesInfos = new HashMap<>();
-        compteurRelation =0;
+        compteurRelation = 0;
     }
-    
-    @Override
-    public int getCompteurRelation() {
-        return compteurRelation;
-    }
-
-
-    
 
     @Override
     public void init() {
@@ -38,18 +33,25 @@ public  final class DbInfo implements DatabaseInfo{
 
     @Override
     public void addTableInfo(TableInfo tableInfo) {
-       tablesInfos.put(tableInfo.getRelation(), tableInfo);
-       compteurRelation++;
+        compteurRelation = tablesInfos.containsKey(tableInfo.getRelation()) ? compteurRelation : compteurRelation + 1;
+        tablesInfos.put(tableInfo.getRelation(), tableInfo);
     }
-
 
     @Override
     public TableInfo getTableInfo(String relation) {
-      return tablesInfos.get(relation);    
+        TableInfo tableInfo = tablesInfos.get(relation);
+
+        Objects.requireNonNull(tableInfo);
+        return tableInfo;
     }
 
-    public static DatabaseInfo getSingleton(){
+    /**
+     * Retourne l'unique instance de {@code DatabaseInfo} .
+     * 
+     * @return une instance de DatabaseInfo
+     */
+    public static DatabaseInfo getSingleton() {
         return gSingleton;
     }
-    
+
 }
