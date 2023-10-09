@@ -1,5 +1,6 @@
 package up.mi.bdda.hcg.main;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -119,7 +120,14 @@ public class DManager implements DiskManager {
 
 	@Override
 	public void writePage(PageId pageId, ByteBuffer buff) {
-		// TODO Auto-generated method stub
+		String fileName = "F".concat(String.valueOf(pageId.getFileIdx())).concat(".data");
+		Path path = Paths.get(DBParams.DBPath, fileName);
+
+		try {
+			Files.write(path, buff.array());
+		} catch (IOException ioe) {
+			ioe.printStackTrace(System.err);
+		}
 	}
 
 	/**
