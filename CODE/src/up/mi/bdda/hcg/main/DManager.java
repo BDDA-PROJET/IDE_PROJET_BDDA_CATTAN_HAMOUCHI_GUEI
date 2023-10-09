@@ -6,8 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
-// import java.util.LinkedList;
-// import java.util.Queue;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
 
 import up.mi.bdda.hcg.api.DiskManager;
@@ -15,14 +15,14 @@ import up.mi.bdda.hcg.api.DiskManager;
 public class DManager implements DiskManager {
 	// private ByteBuffer buffer;
 	private Set<Float> allocIdSet;
-	// private Queue<Float> deallocIdQueue;
+	private Queue<Float> deallocIdQueue;
 	private PageId currentPageId;
 	private static DiskManager gSingleton = new DManager();
 
 	private DManager() {
 		// buffer = ByteBuffer.allocate(DBParams.SGBDPageSize);
 		allocIdSet = new HashSet<>();
-		// deallocIdQueue = new LinkedList<>();
+		deallocIdQueue = new LinkedList<>();
 		currentPageId = new PageId(0, 0);
 	}
 
@@ -54,40 +54,35 @@ public class DManager implements DiskManager {
 	@Override
 	public PageId allocPage() {
 		PageId copy = currentPageId.clone();
+
 		createFile();
 
-		// if (!(deallocIdQueue.isEmpty())) {
-		// float deallocId = deallocIdQueue.poll();
-		// int fId = (int) deallocId;
-		// int pId = (int) Math.round((deallocId % 1) * 100);
-		// copy.set(fId, pId);
-		// } else {
-		// next();
-		// }
+		if (!(deallocIdQueue.isEmpty())) {
+			float deallocId = deallocIdQueue.poll();
+			int fId = (int) deallocId;
+			int pId = (int) Math.round((deallocId % 1) * 100);
+			copy.set(fId, pId);
+		} else {
+			next();
+		}
 
-		next();
 		allocIdSet.add(Float.parseFloat(copy.toString()));
 
 		System.out.println(allocIdSet);
 		return copy;
 	}
 
-	// @Override
-	// public void deallocPage(PageId pageId) {
-	// float id = Float.parseFloat(pageId.toString());
-
-	// if (allocIdSet.remove(id))
-	// deallocIdQueue.add(id);
-
-	// if (allocIdSet.isEmpty()) {
-	// deallocIdQueue.clear();
-	// currentPageId.reset();
-	// }
-	// }
-
 	@Override
 	public void deallocPage(PageId pageId) {
-		// TODO Auto-generated method stub
+		float id = Float.parseFloat(pageId.toString());
+
+		if (allocIdSet.remove(id))
+			deallocIdQueue.add(id);
+
+		if (allocIdSet.isEmpty()) {
+			deallocIdQueue.clear();
+			currentPageId.reset();
+		}
 	}
 
 	@Override
