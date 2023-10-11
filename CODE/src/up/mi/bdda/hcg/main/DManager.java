@@ -1,5 +1,6 @@
 package up.mi.bdda.hcg.main;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -19,7 +20,6 @@ public class DManager implements DiskManager {
 	private Queue<Float> deallocIdQueue;
 	/** L'identifiant de la prochaine page à allouée. */
 	private PageId currentPageId;
-	private static DiskManager gSingleton = new DManager();
 	/** L'unique instance du <code>DiskManager</code>. */
 	private static DiskManager gSingleton = new DManager();
 
@@ -96,20 +96,26 @@ public class DManager implements DiskManager {
 	@Override
 	public int getCurrentCountAllocPages() {
 		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException("Unimplemented method 'getCurrentCountAllocPages'");
 	}
 
 	@Override
 	public void readPage(PageId pageId, ByteBuffer buff) {
 		// TODO Auto-generated method stub
-		pageIdHistory.remove(Float.parseFloat(a.toString()));
+		throw new UnsupportedOperationException("Unimplemented method 'getCurrentCountAllocPages'");
 	}
 
 	@Override
 	public void writePage(PageId pageId, ByteBuffer buff) {
-		String fileName = "F".concat(String.valueOf(currentPageId.getFileIdx())).concat(".data");
+		String fileName = "F".concat(String.valueOf(pageId.getFileIdx())).concat(".data");
 		Path path = Paths.get(DBParams.DBPath, fileName);
-		FIles.write(path , buff.array());
+
+		try {
+			Files.write(path, buff.array());
+			buff.flip();
+		} catch (IOException ioe) {
+			ioe.printStackTrace(System.err);
+		}
 	}
 
 	/**
