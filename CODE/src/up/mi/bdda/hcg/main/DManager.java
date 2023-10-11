@@ -30,12 +30,24 @@ public class DManager implements DiskManager {
 	}
 
 	/**
+	 * Retourne le chemin d'un fichier en fonction du pageId.
+	 * 
+	 * @param pageId le pageId
+	 * @return le chemin du fichier
+	 */
+	private Path getFilePath(PageId pageId) {
+		String fileName = "F".concat(String.valueOf(currentPageId.getFileIdx())).concat(".data");
+		Path path = Paths.get(DBParams.DBPath, fileName);
+
+		return path;
+	}
+
+	/**
 	 * Creation d'un fichier à partir du <code>PageId</code>.
 	 */
 
 	private void createFile() {
-		String fileName = "F".concat(String.valueOf(currentPageId.getFileIdx())).concat(".data");
-		Path path = Paths.get(DBParams.DBPath, fileName);
+		Path path = getFilePath(currentPageId);
 
 		try {
 			Files.createDirectories(path.getParent());
@@ -95,14 +107,14 @@ public class DManager implements DiskManager {
 
 	@Override
 	public int getCurrentCountAllocPages() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getCurrentCountAllocPages'");
+		int count = allocIdSet.size();
+
+		return count;
 	}
 
 	@Override
 	public void readPage(PageId pageId, ByteBuffer buff) {
-		String fileName = "F".concat(String.valueOf(pageId.getFileIdx())).concat(".data");
-		Path path = Paths.get(DBParams.DBPath, fileName);
+		Path path = getFilePath(pageId);
 
 		try {
 			byte[] data = Files.readAllBytes(path);
@@ -115,8 +127,7 @@ public class DManager implements DiskManager {
 
 	@Override
 	public void writePage(PageId pageId, ByteBuffer buff) {
-		String fileName = "F".concat(String.valueOf(pageId.getFileIdx())).concat(".data");
-		Path path = Paths.get(DBParams.DBPath, fileName);
+		Path path = getFilePath(pageId);
 
 		try {
 			Files.write(path, buff.array());
