@@ -1,5 +1,6 @@
 package up.mi.bdda.hcg.main;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -31,6 +32,7 @@ public class DManager implements DiskManager {
 	/**
 	 * Creation d'un fichier à partir du <code>PageId</code>.
 	 */
+
 	private void createFile() {
 		String fileName = "F".concat(String.valueOf(currentPageId.getFileIdx())).concat(".data");
 		Path path = Paths.get(DBParams.DBPath, fileName);
@@ -94,17 +96,27 @@ public class DManager implements DiskManager {
 	@Override
 	public int getCurrentCountAllocPages() {
 		// TODO Auto-generated method stub
-		return 0;
+		throw new UnsupportedOperationException("Unimplemented method 'getCurrentCountAllocPages'");
 	}
 
 	@Override
 	public void readPage(PageId pageId, ByteBuffer buff) {
-		// TODO Auto-generated method stub
+		String fileName = "F".concat(String.valueOf(pageId.getFileIdx())).concat(".data");
+		Path path = Paths.get(DBParams.DBPath, fileName);
+
+		try {
+			byte[] data = Files.readAllBytes(path);
+			buff.put(ByteBuffer.wrap(data));
+			buff.flip();
+		} catch (IOException ioe) {
+			ioe.printStackTrace(System.err);
+		}
 	}
 
 	@Override
 	public void writePage(PageId pageId, ByteBuffer buff) {
 		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'writePage'");
 	}
 
 	/**
