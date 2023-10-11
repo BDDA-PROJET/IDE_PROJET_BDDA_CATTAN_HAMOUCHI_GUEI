@@ -101,8 +101,16 @@ public class DManager implements DiskManager {
 
 	@Override
 	public void readPage(PageId pageId, ByteBuffer buff) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getCurrentCountAllocPages'");
+		String fileName = "F".concat(String.valueOf(pageId.getFileIdx())).concat(".data");
+		Path path = Paths.get(DBParams.DBPath, fileName);
+
+		try {
+			byte[] data = Files.readAllBytes(path);
+			buff.put(ByteBuffer.wrap(data));
+			buff.flip();
+		} catch (IOException ioe) {
+			ioe.printStackTrace(System.err);
+		}
 	}
 
 	@Override
