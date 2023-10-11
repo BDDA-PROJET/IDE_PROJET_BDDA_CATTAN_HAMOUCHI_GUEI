@@ -115,8 +115,15 @@ public class DManager implements DiskManager {
 
 	@Override
 	public void writePage(PageId pageId, ByteBuffer buff) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'writePage'");
+		String fileName = "F".concat(String.valueOf(pageId.getFileIdx())).concat(".data");
+		Path path = Paths.get(DBParams.DBPath, fileName);
+
+		try {
+			Files.write(path, buff.array());
+			buff.flip();
+		} catch (IOException ioe) {
+			ioe.printStackTrace(System.err);
+		}
 	}
 
 	/**
