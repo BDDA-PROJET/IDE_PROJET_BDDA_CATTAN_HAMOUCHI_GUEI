@@ -1,5 +1,11 @@
 package up.mi.bdda.hcg.tests;
 import up.mi.bdda.hcg.main.DBParams;
+<<<<<<< Updated upstream
+=======
+import up.mi.bdda.hcg.main.DManager;
+import up.mi.bdda.hcg.main.PageId;
+
+>>>>>>> Stashed changes
 import org.junit.jupiter.api.Test;
 
 public class DiskManagerTest {
