@@ -1,6 +1,7 @@
 package up.mi.bdda.hcg.main;
 
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -29,6 +30,13 @@ public class DManager implements DiskManager {
 		currentPageId = new PageId(0, 0);
 	}
 
+	private RandomAccessFile getAccessFile(PageId pageId) throws IOException{
+		RandomAccessFile file =  new RandomAccessFile(getFilePath(pageId).toString(),"rw");
+			file.seek((pageId.getPageIdx())*DBParams.SGBDPageSize);
+			return file;
+
+	}
+
 	/**
 	 * Retourne le chemin d'un fichier en fonction du pageId.
 	 * 
@@ -36,7 +44,7 @@ public class DManager implements DiskManager {
 	 * @return le chemin du fichier
 	 */
 	private Path getFilePath(PageId pageId) {
-		String fileName = "F".concat(String.valueOf(currentPageId.getFileIdx())).concat(".data");
+		String fileName = "F".concat(String.valueOf(pageId.getFileIdx())).concat(".data");
 		Path path = Paths.get(DBParams.DBPath, fileName);
 
 		return path;
@@ -114,28 +122,31 @@ public class DManager implements DiskManager {
 
 	@Override
 	public void readPage(PageId pageId, ByteBuffer buff) {
-		Path path = getFilePath(pageId);
-
 		try {
-			byte[] data = Files.readAllBytes(path);
-			buff.put(ByteBuffer.wrap(data));
-			buff.flip();
-		} catch (IOException ioe) {
-			ioe.printStackTrace(System.err);
+			RandomAccessFile file  =  getAccessFile(pageId);
+			file.read(buff.array(), 0, DBParams.SGBDPageSize);
+			file.close();
+		} catch (IOException e) {
+			e.printStackTrace(System.err);
+			
 		}
 	}
-
+	
 	@Override
 	public void writePage(PageId pageId, ByteBuffer buff) {
-		Path path = getFilePath(pageId);
-
 		try {
-			Files.write(path, buff.array());
-			buff.flip();
-		} catch (IOException ioe) {
-			ioe.printStackTrace(System.err);
+			RandomAccessFile file  =  getAccessFile(pageId);
+			file.write(buff.array(), 0, DBParams.SGBDPageSize);
+			file.close();
+		} catch (IOException e) {
+			e.printStackTrace(System.err);
 		}
 	}
+
+	 
+	
+
+
 
 	/**
 	 * Retourne l'unique instance du <code>DiskManager</code>.
@@ -145,4 +156,8 @@ public class DManager implements DiskManager {
 	public static DiskManager getSingleton() {
 		return gSingleton;
 	}
+
+	
+
+	
 }
