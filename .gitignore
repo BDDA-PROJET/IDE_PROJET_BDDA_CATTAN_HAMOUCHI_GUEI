@@ -1,1 +1,6 @@
 /CODE/bin/
+.env
+docs/
+documenter.py
+documenter_config.yaml
+commitLintTrick.txt
