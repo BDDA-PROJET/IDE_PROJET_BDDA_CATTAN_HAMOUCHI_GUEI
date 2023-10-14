@@ -1,7 +1,8 @@
 package up.mi.bdda.hcg.main;
 
 /**
- * Cette classe regroupe les paramètres de notre application.
+ * Cette classe représente les paramètres de l'application et fournit des
+ * valeurs par défaut pour ces paramètres.
  */
 public class DBParams {
 
