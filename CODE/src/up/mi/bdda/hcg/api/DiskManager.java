@@ -2,6 +2,7 @@ package up.mi.bdda.hcg.api;
 
 import java.nio.ByteBuffer;
 
+import up.mi.bdda.hcg.main.DManager;
 import up.mi.bdda.hcg.main.PageId;
 
 /**
@@ -65,4 +66,13 @@ public interface DiskManager {
    * @see up.mi.bdda.hcg.api.DiskManager#deallocPage(PageId)
    */
   int getCurrentCountAllocPages();
+
+  /**
+   * Retourne l'unique instance de {@code DiskManager} .
+   * 
+   * @return une instance de DiskManager
+   */
+  public static DiskManager getSingleton() {
+    return DManager.getSingleton();
+  }
 }

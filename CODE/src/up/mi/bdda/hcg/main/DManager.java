@@ -201,9 +201,9 @@ public class DManager implements DiskManager {
 	}
 
 	/**
-	 * Retourne l'unique instance du <code>DiskManager</code>.
+	 * Retourne l'unique instance de {@code DiskManager} .
 	 * 
-	 * @return le DiskManager
+	 * @return une instance de DiskManager
 	 */
 	public static DiskManager getSingleton() {
 		return gSingleton;
