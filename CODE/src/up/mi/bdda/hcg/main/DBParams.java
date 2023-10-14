@@ -1,10 +1,8 @@
 package up.mi.bdda.hcg.main;
 
-import up.mi.bdda.hcg.api.DiskManager;
-
-
 /**
- * Cette classe regroupe les paramètres de notre application.
+ * Cette classe représente les paramètres de l'application et fournit des
+ * valeurs par défaut pour ces paramètres.
  */
 public class DBParams {
 
@@ -22,8 +20,5 @@ public class DBParams {
 		DBPath = "DB";
 		SGBDPageSize = 4096;
 		DMFFileCount = 4;
-
-		DiskManager disk = DManager.getSingleton();
 	}
-
 }

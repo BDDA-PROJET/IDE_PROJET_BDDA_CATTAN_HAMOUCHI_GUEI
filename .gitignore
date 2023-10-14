@@ -1,1 +1,6 @@
 /CODE/bin/
+docs/
+.env
+*.py
+*.yaml
+commitLintTrick.txt

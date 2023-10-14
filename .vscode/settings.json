@@ -3,7 +3,6 @@
     "java.project.outputPath": "./CODE/bin",
     "java.project.referencedLibraries": [
         "./CODE/lib/**/*.jar",
-        "test-lib\\**\\*.jar"
     ],
     "java.debug.settings.vmArgs": "-ea",
 }
