@@ -1,9 +1,5 @@
 package up.mi.bdda.hcg.main;
 
-import up.mi.bdda.hcg.api.BufferManager;
-import up.mi.bdda.hcg.api.DiskManager;
-import up.mi.bdda.hcg.main.disk.PageId;
-
 /**
  * Cette classe représente les paramètres de l'application et fournit des
  * valeurs par défaut pour ces paramètres.
