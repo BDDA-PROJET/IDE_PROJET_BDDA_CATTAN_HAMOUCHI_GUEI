@@ -1,4 +1,4 @@
-package up.mi.bdda.hcg.main;
+package up.mi.bdda.hcg.main.disk;
 
 /**
  * Cette classe associe une page à un fichier et
@@ -9,6 +9,7 @@ package up.mi.bdda.hcg.main;
  * @see java.lang.Cloneable
  */
 public class PageId implements Cloneable {
+
 	/** L’identifiant du fichier. */
 	private int fileIdx;
 
@@ -100,7 +101,7 @@ public class PageId implements Cloneable {
 	}
 
 	@Override
-	protected PageId clone() {
+	public PageId clone() {
 		PageId pageId = null;
 
 		try {
@@ -115,5 +116,27 @@ public class PageId implements Cloneable {
 	@Override
 	public String toString() {
 		return fileIdx + "." + pageIdx;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if ((obj == null) || (obj.getClass() != this.getClass()))
+			return false;
+
+		PageId otherPageId = (PageId) obj;
+
+		return this.fileIdx == otherPageId.fileIdx && this.pageIdx == otherPageId.pageIdx;
+	}
+
+	public boolean isValid() {
+		if (this.fileIdx != -1) {
+			return true;
+		} else {
+			return false;
+		}
+
 	}
 }

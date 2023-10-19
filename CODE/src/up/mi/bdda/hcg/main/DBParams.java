@@ -1,5 +1,9 @@
 package up.mi.bdda.hcg.main;
 
+import up.mi.bdda.hcg.api.BufferManager;
+import up.mi.bdda.hcg.api.DiskManager;
+import up.mi.bdda.hcg.main.disk.PageId;
+
 /**
  * Cette classe représente les paramètres de l'application et fournit des
  * valeurs par défaut pour ces paramètres.
@@ -15,10 +19,14 @@ public class DBParams {
 	/** Le nombre maximal de pages dans un fichier. */
 	public static int DMFFileCount;
 
+	/** Le nombre maximal de frames disponible pour le {@code BufferManager} */
+	public static int frameCount;
+
 	public static void main(String[] args) {
 
 		DBPath = "DB";
 		SGBDPageSize = 4096;
 		DMFFileCount = 4;
+		frameCount = 2;
 	}
 }
