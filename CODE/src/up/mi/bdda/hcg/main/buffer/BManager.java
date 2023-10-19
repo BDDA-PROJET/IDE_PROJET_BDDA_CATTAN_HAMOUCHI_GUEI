@@ -73,9 +73,19 @@ public class BManager implements BufferManager {
   }
 
   @Override
-  public void freePage(PageId pageId, boolean valdirty) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'freePage'");
+  public void freePage(PageId pageId, boolean dirty) {
+    DiskManager disk = DiskManager.getSingleton();
+
+    for (Frame frame : frameList) {
+      if (frame.getPageId().equals(pageId)) {
+        if (dirty) {
+          disk.writePage(pageId, frame.getBuffer());
+          frame.setFlagDirty(false);
+        }
+
+        frame.decrementPinCount();
+      }
+    }
   }
 
   @Override
