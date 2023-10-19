@@ -90,8 +90,14 @@ public class BManager implements BufferManager {
 
   @Override
   public void flushAll() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'flushAll'");
+    DiskManager disk = DiskManager.getSingleton();
+
+    for (Frame frame : frameList) {
+      if (frame.isDirty()) {
+        disk.writePage(frame.getPageId(), frame.getBuffer());
+      }
+      frame.reset();
+    }
   }
 
   public static BufferManager getSingleton() {
