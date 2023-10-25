@@ -1,4 +1,4 @@
-package up.mi.bdda.hcg.main;
+package up.mi.bdda.hcg.main.disk;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -9,10 +9,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Deque;
 import java.util.Set;
 
 import up.mi.bdda.hcg.api.DiskManager;
+import up.mi.bdda.hcg.main.DBParams;
 
 /**
  * Cette classe implémente l'interface {@code DiskManager}.
@@ -31,15 +32,15 @@ import up.mi.bdda.hcg.api.DiskManager;
  * 
  * @see up.mi.bdda.hcg.api.DiskManager
  */
-public class DManager implements DiskManager {
+public final class DManager implements DiskManager {
 	/** l'ensemble des identifiants de page alloués. */
-	private Set<Float> allocIdSet;
+	private final Set<Float> allocIdSet;
 	/** la file d'attente des identifiants de page désalloués. */
-	private Queue<Float> deallocIdQueue;
+	private final Deque<Float> deallocIdQueue;
 	/** L'identifiant de la page à allouée. */
-	private PageId currentlyAvailablePageId;
+	private final PageId currentlyAvailablePageId;
 	/** L'unique instance du {@code DiskManager}. */
-	private static DiskManager gSingleton = new DManager();
+	private static final DiskManager gSingleton = new DManager();
 
 	/**
 	 * Le constructeur par défaut de la classe DManager. Il initialise les attributs
@@ -49,6 +50,13 @@ public class DManager implements DiskManager {
 		allocIdSet = new HashSet<>();
 		deallocIdQueue = new LinkedList<>();
 		currentlyAvailablePageId = new PageId(0, 0);
+	}
+
+	private RandomAccessFile getAccessFile(PageId pageId) throws IOException {
+		RandomAccessFile file = new RandomAccessFile(getFilePath(pageId).toString(), "rw");
+		file.seek((pageId.getPageIdx()) * DBParams.SGBDPageSize);
+		return file;
+
 	}
 
 	/**
@@ -73,12 +81,11 @@ public class DManager implements DiskManager {
 
 	/**
 	 * Retourne un objet {@code RandomAccessFile} et positionne
-	 * le curseur du fichier en fonction du pageId passé en paramètre afin de
-	 * permetre
-	 * la lecture ou l'écriture dans un fichier.
+	 * le curseur du fichier en fonction de l'argument pageId afin de permetre la
+	 * lecture ou l'écriture dans un fichier.
 	 * 
-	 * @param pageId le pageId du fichier où lire et écrire
-	 * @return un RandomAccessFile
+	 * @param pageId l'identifiant de la page où lire et écrire
+	 * @return un object RandomAccessFile
 	 * @throws IOException if an I/O error occurs.
 	 */
 	private RandomAccessFile getRandomAccessFile(PageId pageId) throws IOException {
@@ -97,7 +104,7 @@ public class DManager implements DiskManager {
 	 * {@code Files.createFile()} pour créer le fichier et ses répertoires parents
 	 * s'ils n'existent pas.
 	 * 
-	 * @see up.mi.bdda.hcg.main.DManager#getFilePath(PageId)
+	 * @see up.mi.bdda.hcg.main.disk.DManager#getFilePath(PageId)
 	 * @see java.nio.file.Files#createDirectories(Path,
 	 *      java.nio.file.attribute.FileAttribute...)
 	 * @see java.nio.file.Files#createFile(Path,
@@ -180,7 +187,7 @@ public class DManager implements DiskManager {
 	@Override
 	public void readPage(PageId pageId, ByteBuffer buff) {
 		try {
-			RandomAccessFile file = getRandomAccessFile(pageId);
+			RandomAccessFile file = getAccessFile(pageId);
 			file.read(buff.array(), 0, DBParams.SGBDPageSize);
 			file.close();
 		} catch (IOException e) {

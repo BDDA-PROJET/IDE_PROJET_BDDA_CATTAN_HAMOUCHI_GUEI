@@ -15,10 +15,15 @@ public class DBParams {
 	/** Le nombre maximal de pages dans un fichier. */
 	public static int DMFFileCount;
 
+	/** Le nombre maximal de frames disponible pour le {@code BufferManager} */
+	public static int frameCount;
+
 	public static void main(String[] args) {
 
 		DBPath = "DB";
 		SGBDPageSize = 4096;
 		DMFFileCount = 4;
+		frameCount = 2;
+
 	}
 }
