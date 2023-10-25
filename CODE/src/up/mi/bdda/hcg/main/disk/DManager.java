@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Queue;
+import java.util.Deque;
 import java.util.Set;
 
 import up.mi.bdda.hcg.api.DiskManager;
@@ -32,15 +32,15 @@ import up.mi.bdda.hcg.main.DBParams;
  * 
  * @see up.mi.bdda.hcg.api.DiskManager
  */
-public class DManager implements DiskManager {
+public final class DManager implements DiskManager {
 	/** l'ensemble des identifiants de page alloués. */
-	private Set<Float> allocIdSet;
+	private final Set<Float> allocIdSet;
 	/** la file d'attente des identifiants de page désalloués. */
-	private Queue<Float> deallocIdQueue;
+	private final Deque<Float> deallocIdQueue;
 	/** L'identifiant de la page à allouée. */
-	private PageId currentlyAvailablePageId;
+	private final PageId currentlyAvailablePageId;
 	/** L'unique instance du {@code DiskManager}. */
-	private static DiskManager gSingleton = new DManager();
+	private static final DiskManager gSingleton = new DManager();
 
 	/**
 	 * Le constructeur par défaut de la classe DManager. Il initialise les attributs

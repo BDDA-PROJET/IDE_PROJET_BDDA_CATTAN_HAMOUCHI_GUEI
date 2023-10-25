@@ -2,15 +2,5 @@
 *.py
 *.yaml
 /CODE/bin/
-<<<<<<< HEAD
 docs/
-.env
-*.py
-*.yaml
 commitLintTrick.txt
-<<<<<<< HEAD
-=======
-=======
-/docs
->>>>>>> fda188f (updated)
->>>>>>> e004445 (chang)

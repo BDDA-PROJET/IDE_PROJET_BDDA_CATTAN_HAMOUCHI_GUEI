@@ -24,5 +24,6 @@ public class DBParams {
 		SGBDPageSize = 4096;
 		DMFFileCount = 4;
 		frameCount = 2;
+
 	}
 }
