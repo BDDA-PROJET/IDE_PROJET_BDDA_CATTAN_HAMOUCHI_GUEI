@@ -3,10 +3,10 @@ package up.mi.bdda.hcg.main.database;
 import java.nio.ByteBuffer;
 
 public class Record {
-  Object tabInfo;
+  TableInfo tabInfo;
   Field[] recvalues;
 
-  public Record(Field tabInfo) {
+  public Record(TableInfo tabInfo) {
     this.tabInfo = tabInfo;
     recvalues = new Field[2];
   }
