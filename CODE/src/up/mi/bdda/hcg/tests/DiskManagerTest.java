@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import up.mi.bdda.hcg.api.DiskManager;
 import up.mi.bdda.hcg.main.DBParams;
-import up.mi.bdda.hcg.main.disk.PageId;
+import up.mi.bdda.hcg.main.page.PageId;
 
 public class DiskManagerTest {
   @Test

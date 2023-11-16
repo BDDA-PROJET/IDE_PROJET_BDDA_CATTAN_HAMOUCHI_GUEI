@@ -3,7 +3,7 @@ package up.mi.bdda.hcg.main.buffer;
 import java.nio.ByteBuffer;
 
 import up.mi.bdda.hcg.main.DBParams;
-import up.mi.bdda.hcg.main.disk.PageId;
+import up.mi.bdda.hcg.main.page.PageId;
 
 /**
  * Cette classe représente une frame dans un buffer. Elle contient des méthodes

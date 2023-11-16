@@ -14,6 +14,7 @@ import java.util.Set;
 
 import up.mi.bdda.hcg.api.DiskManager;
 import up.mi.bdda.hcg.main.DBParams;
+import up.mi.bdda.hcg.main.page.PageId;
 
 /**
  * Cette classe implémente l'interface {@code DiskManager}.

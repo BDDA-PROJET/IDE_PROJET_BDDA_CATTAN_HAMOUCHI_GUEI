@@ -1,4 +1,4 @@
-package up.mi.bdda.hcg.main.disk;
+package up.mi.bdda.hcg.main.page;
 
 /**
  * Cette classe associe une page à un fichier et
@@ -20,7 +20,7 @@ public class PageId implements Cloneable {
 	 * Le constructeur par défaut de la classe PageId. Il appelle la méthode
 	 * {@code reset()} pour initialiser {@code fileIdx} et {@code pageIdx} à 0.
 	 * 
-	 * @see up.mi.bdda.hcg.main.PageId#reset()
+	 * @see up.mi.bdda.hcg.main.page.PageId#reset()
 	 */
 	public PageId() {
 		reset();
@@ -94,10 +94,10 @@ public class PageId implements Cloneable {
 	 * PageId à 0 en appelant la méthode {@code set()} avec les arguments 0
 	 * et 0.
 	 * 
-	 * @see up.mi.bdda.hcg.main.PageId#set(int, int)
+	 * @see up.mi.bdda.hcg.main.page.PageId#set(int, int)
 	 */
 	public void reset() {
-		set(0, 0);
+		set(-1, -1);
 	}
 
 	@Override
@@ -132,11 +132,7 @@ public class PageId implements Cloneable {
 	}
 
 	public boolean isValid() {
-		if (this.fileIdx != -1) {
-			return true;
-		} else {
-			return false;
-		}
+		return fileIdx > -1 && pageIdx > -1;
 
 	}
 }

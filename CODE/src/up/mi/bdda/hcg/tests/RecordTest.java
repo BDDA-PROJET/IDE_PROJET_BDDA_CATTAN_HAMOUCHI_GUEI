@@ -14,7 +14,7 @@ import up.mi.bdda.hcg.main.database.ColInfo;
 import up.mi.bdda.hcg.main.database.Record;
 import up.mi.bdda.hcg.main.database.TableInfo;
 import up.mi.bdda.hcg.main.database.Type;
-import up.mi.bdda.hcg.main.disk.PageId;
+import up.mi.bdda.hcg.main.page.PageId;
 
 public class RecordTest {
   @Test

@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 import up.mi.bdda.hcg.api.BufferManager;
 import up.mi.bdda.hcg.api.DiskManager;
 import up.mi.bdda.hcg.main.DBParams;
-import up.mi.bdda.hcg.main.disk.PageId;
+import up.mi.bdda.hcg.main.page.PageId;
 
 /**
  * Cette classe implémente l'interface `BufferManager` et fournit des

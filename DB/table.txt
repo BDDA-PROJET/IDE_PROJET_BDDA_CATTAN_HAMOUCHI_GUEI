@@ -1,5 +1,0 @@
-Etudiant
-AGE (INT) -> 20
-TAILLE (FLOAT) -> 1.75
-ADRESSE (VARSTRING(50)) -> 45 rue des saints pères
-

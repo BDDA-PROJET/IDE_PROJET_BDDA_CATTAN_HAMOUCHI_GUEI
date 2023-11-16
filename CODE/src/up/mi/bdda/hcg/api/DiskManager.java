@@ -3,7 +3,7 @@ package up.mi.bdda.hcg.api;
 import java.nio.ByteBuffer;
 
 import up.mi.bdda.hcg.main.disk.DManager;
-import up.mi.bdda.hcg.main.disk.PageId;
+import up.mi.bdda.hcg.main.page.PageId;
 
 /**
  * Cette API permet de gerer la memiore du disque en manipulant la couche bas

@@ -1,14 +1,9 @@
 package up.mi.bdda.hcg.main.database;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-
-import up.mi.bdda.hcg.main.DBParams;
 
 public class Record {
   TableInfo tabInfo;

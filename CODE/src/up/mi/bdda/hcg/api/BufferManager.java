@@ -3,7 +3,7 @@ package up.mi.bdda.hcg.api;
 import java.nio.ByteBuffer;
 
 import up.mi.bdda.hcg.main.buffer.BManager;
-import up.mi.bdda.hcg.main.disk.PageId;
+import up.mi.bdda.hcg.main.page.PageId;
 
 public interface BufferManager {
   /**
