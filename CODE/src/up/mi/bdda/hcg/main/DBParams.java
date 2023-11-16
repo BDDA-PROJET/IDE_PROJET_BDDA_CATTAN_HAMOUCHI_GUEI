@@ -1,15 +1,10 @@
 package up.mi.bdda.hcg.main;
 
 import java.nio.ByteBuffer;
-<<<<<<< HEAD
-import java.util.Arrays;
+import java.util.List;
 
 import up.mi.bdda.hcg.api.BufferManager;
 import up.mi.bdda.hcg.api.DatabaseInfo;
-=======
-import java.util.logging.Logger;
-
->>>>>>> 7398790 (feat: add writePage)
 import up.mi.bdda.hcg.api.DiskManager;
 import up.mi.bdda.hcg.main.database.ColInfo;
 import up.mi.bdda.hcg.main.database.Record;
@@ -32,12 +27,8 @@ public class DBParams {
 	/** Le nombre maximal de pages dans un fichier. */
 	public static int DMFFileCount;
 
-<<<<<<< HEAD
 	/** Le nombre maximal de frames disponible pour le {@code BufferManager} */
 	public static int frameCount;
-=======
-	public static Logger log = Logger.getLogger(DBParams.class.getPackage().getName());
->>>>>>> 7398790 (feat: add writePage)
 
 	public static void main(String[] args) {
 
@@ -46,47 +37,35 @@ public class DBParams {
 		DMFFileCount = 4;
 		frameCount = 2;
 
-		TableInfo user = new TableInfo("User", 4,
-				Arrays.asList(
-						new ColInfo("id", Type.INT),
-						new ColInfo("name", Type.STRING.size(6)),
-						new ColInfo("height", Type.FLOAT),
-						new ColInfo("address", Type.VARSTRING.size(20))));
+		TableInfo user = new TableInfo("Etudiant", List.of(
+				new ColInfo("AGE", Type.INT),
+				new ColInfo("TAILLE", Type.FLOAT),
+				new ColInfo("ADRESSE", Type.VARSTRING.size(50))));
 
-<<<<<<< HEAD
-		// PageId pId0 = DiskManager.getSingleton().allocPage();
-		PageId pId = DiskManager.getSingleton().allocPage();
-		// BufferManager.getSingleton().getPage(pId0);
-		ByteBuffer buff = BufferManager.getSingleton().getPage(pId);
+		PageId pId0 = DiskManager.getSingleton().allocPage();
+		// PageId pId = DiskManager.getSingleton().allocPage();
+		ByteBuffer buffW = BufferManager.getSingleton().getPage(pId0);
+		// ByteBuffer buffR = BufferManager.getSingleton().getPage(pId);
 		// BufferManager.getSingleton().freePage(pId0, true);
 		// BufferManager.getSingleton().freePage(pId, true);
+
 		DatabaseInfo.getSingleton().addTableInfo(user);
+
 		Record record = new Record(user);
 
 		// ECRITURE D'UNE RECORD
-		// record.addRecValues(new Object[] { 1, "Boby", 1.50f, "1 rue de paris" });
-		// int size = record.writeToBuffer(buff, 0);
-		// BufferManager.getSingleton().freePage(pId, true);
-=======
-		ByteBuffer buff = ByteBuffer.allocate(SGBDPageSize);
+		int size = record.writeToBuffer(buffW, 0);
+		System.out.println("# RECORD WRITE SIZE : " + size);
 
-		buff.putInt(3);
-
-		var p1 = disk.allocPage();
-
-		disk.writePage(p1, buff);
->>>>>>> 7398790 (feat: add writePage)
+		BufferManager.getSingleton().freePage(pId0, true);
 
 		// LECTURE D'UNE RECORD
-		int size = record.readFromBuffer(buff, 0);
+		int size2 = record.readFromBuffer(buffW, 0);
 
 		// print the record
 		System.out.println(record);
+		System.out.println("# RECORD READ SIZE : " + size2);
 
-		// int totalSize = size + record.readFromBuffer(buff, size);
-		// print the record
-		// System.out.println(record);
-
-		System.out.println("# RECORD SIZE : " + size);
+		BufferManager.getSingleton().freePage(pId0, false);
 	}
 }

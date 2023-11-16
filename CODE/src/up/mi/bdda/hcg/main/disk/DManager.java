@@ -32,7 +32,7 @@ import up.mi.bdda.hcg.main.DBParams;
  * 
  * @see up.mi.bdda.hcg.api.DiskManager
  */
-public final class DManager implements DiskManager {
+public final class DManager implements DiskManager, java.io.Serializable {
 	/** l'ensemble des identifiants de page alloués. */
 	private final Set<Float> allocIdSet;
 	/** la file d'attente des identifiants de page désalloués. */

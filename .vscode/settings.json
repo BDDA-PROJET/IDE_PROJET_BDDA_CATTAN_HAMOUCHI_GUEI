@@ -1,8 +1,8 @@
 {
-    "java.project.sourcePaths": ["./CODE/src"],
-    "java.project.outputPath": "./CODE/bin",
-    "java.project.referencedLibraries": [
-        "./CODE/lib/**/*.jar",
-    ],
-    "java.debug.settings.vmArgs": "-ea",
+	"java.project.sourcePaths": ["./CODE/src"],
+	"java.project.outputPath": "./CODE/bin",
+	"java.project.referencedLibraries": ["./CODE/lib/**/*.jar"],
+	"java.debug.settings.vmArgs": "-ea",
+	"cSpell.language": "en,fr-FR",
+	"cSpell.words": ["VARSTRING"]
 }

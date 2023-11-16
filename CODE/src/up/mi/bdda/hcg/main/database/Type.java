@@ -17,12 +17,12 @@ public enum Type {
    * Correspondant à une chaîne de caractères de taille (nombre de caractères)
    * exactement T
    */
-  STRING(null),
+  STRING(2),
   /**
    * Correspondant à une chaîne de caractères de taille variable, mais dont la
    * taille maximale (nombre maximal de caractères) est T
    */
-  VARSTRING(null);
+  VARSTRING(2);
 
   /** La taille d'un type de donné. */
   private int size;
