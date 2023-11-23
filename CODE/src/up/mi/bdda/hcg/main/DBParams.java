@@ -10,6 +10,7 @@ import up.mi.bdda.hcg.main.database.ColInfo;
 import up.mi.bdda.hcg.main.database.Record;
 import up.mi.bdda.hcg.main.database.TableInfo;
 import up.mi.bdda.hcg.main.database.Type;
+import up.mi.bdda.hcg.main.file.FileManager;
 import up.mi.bdda.hcg.main.page.PageId;
 
 /**
@@ -37,35 +38,24 @@ public class DBParams {
 		DMFFileCount = 4;
 		frameCount = 2;
 
-		TableInfo user = new TableInfo("Etudiant", List.of(
-				new ColInfo("AGE", Type.INT),
-				new ColInfo("TAILLE", Type.FLOAT),
-				new ColInfo("ADRESSE", Type.VARSTRING.size(50))));
+		ByteBuffer buff = ByteBuffer.allocate(600);
 
+		TableInfo user = new TableInfo(buff, "Etudiant", List.of(
+			new ColInfo("AGE", Type.INT),
+			new ColInfo("TAILLE", Type.FLOAT),
+			new ColInfo("ADRESSE", Type.VARSTRING.size(50))));
+	
 		PageId pId0 = DiskManager.getSingleton().allocPage();
-		// PageId pId = DiskManager.getSingleton().allocPage();
 		ByteBuffer buffW = BufferManager.getSingleton().getPage(pId0);
-		// ByteBuffer buffR = BufferManager.getSingleton().getPage(pId);
-		// BufferManager.getSingleton().freePage(pId0, true);
-		// BufferManager.getSingleton().freePage(pId, true);
-
-		DatabaseInfo.getSingleton().addTableInfo(user);
-
+	
 		Record record = new Record(user);
+		record.addRecValues(
+        new Object[] {
+            20,
+            1.80f,
+            "1 rue de la paix"
+        });
 
-		// ECRITURE D'UNE RECORD
-		int size = record.writeToBuffer(buffW, 0);
-		System.out.println("# RECORD WRITE SIZE : " + size);
-
-		BufferManager.getSingleton().freePage(pId0, true);
-
-		// LECTURE D'UNE RECORD
-		int size2 = record.readFromBuffer(buffW, 0);
-
-		// print the record
-		System.out.println(record);
-		System.out.println("# RECORD READ SIZE : " + size2);
-
-		BufferManager.getSingleton().freePage(pId0, false);
+		FileManager.getSingleton().writeRecordToDataPage(record, pId0);
 	}
 }

@@ -28,6 +28,7 @@ public class TableInfo {
         headerPageId = new HeaderPage(buff);
         this.colInfos = new ArrayList<>(colInfos);
         this.relation = relation;
+        
     }
 
     public String getRelation() {
@@ -40,6 +41,10 @@ public class TableInfo {
 
     public ColInfo[] getColInfos() {
         return colInfos.stream().toArray(ColInfo[]::new);
+    }
+    
+    public HeaderPage getHeaderPageId(){
+        return headerPageId;
     }
 
 }

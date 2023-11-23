@@ -23,8 +23,10 @@ public class RecordTest {
     DBParams.SGBDPageSize = 4096;
     DBParams.DMFFileCount = 4;
     DBParams.frameCount = 2;
+    
+    ByteBuffer buff = ByteBuffer.allocate(600);
 
-    TableInfo user = new TableInfo("Etudiant", List.of(
+    TableInfo user = new TableInfo(buff, "Etudiant", List.of(
         new ColInfo("AGE", Type.INT),
         new ColInfo("TAILLE", Type.FLOAT),
         new ColInfo("ADRESSE", Type.VARSTRING.size(50))));
