@@ -1,6 +1,5 @@
 package up.mi.bdda.hcg.tests;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.nio.ByteBuffer;
 import java.util.List;

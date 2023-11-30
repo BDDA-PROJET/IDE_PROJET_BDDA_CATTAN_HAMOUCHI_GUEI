@@ -1,5 +1,6 @@
 package up.mi.bdda.hcg.main.page;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,7 @@ public class DataPage {
   private List<Record> records;
   private Slot slot;
   private int freeSpace;
+  private ByteBuffer buff;
 
   public DataPage(PageId pageId) {
     this.pageId = pageId;
@@ -21,6 +23,32 @@ public class DataPage {
     freeSpace = 8;
   }
 
+  public DataPage(ByteBuffer buff) {
+    this.buff = buff;
+  }
+
+  public void setNextPageId(PageId nextPageId) {
+    this.nextPageId = nextPageId;
+  }
+
+   public PageId getNextPageId() {
+    return nextPageId;
+  }
+
+
+  public void setPosDebutRecord(int i, int valeur) {
+    int position = DBParams.SGBDPageSize - 4-4 - 2*4*(i+1);
+    buff.position(position);
+    buff.putInt(valeur);
+  }
+
+  public int getPosDebutRecord(int i) {
+    int position = DBParams.SGBDPageSize - 4-4 - 2*4*(i+1);
+    buff.position(position);
+    return buff.getInt();
+
+    
+  }
   public PageId getPageId() {
       return pageId;
   }
@@ -31,6 +59,19 @@ public class DataPage {
 
   public List<Record> getRecords() {
       return records;
+  }
+
+  public int getNbRecords(){
+    int pos =  DBParams.SGBDPageSize-8;
+    buff.position(pos);
+    return buff.getInt()+1;
+  }
+
+  public int getTailleRecord(int i){
+    int pos = DBParams.SGBDPageSize - 4-4 - 2*4*(i+1) +4;
+    buff.position(pos);
+    return buff.getInt();
+    
   }
 
   public void setFreeSpace(int size) {

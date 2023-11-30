@@ -1,10 +1,9 @@
 package up.mi.bdda.hcg.tests;
 
-<<<<<<< Updated upstream
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
-=======
->>>>>>> Stashed changes
+import java.nio.ByteBuffer;
+
 import org.junit.jupiter.api.Test;
 
 import up.mi.bdda.hcg.api.DiskManager;

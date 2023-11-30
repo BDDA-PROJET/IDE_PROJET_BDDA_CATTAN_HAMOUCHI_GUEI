@@ -3,8 +3,6 @@ package up.mi.bdda.hcg.main;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-import up.mi.bdda.hcg.api.BufferManager;
-import up.mi.bdda.hcg.api.DatabaseInfo;
 import up.mi.bdda.hcg.api.DiskManager;
 import up.mi.bdda.hcg.main.database.ColInfo;
 import up.mi.bdda.hcg.main.database.Record;
@@ -46,7 +44,6 @@ public class DBParams {
 			new ColInfo("ADRESSE", Type.VARSTRING.size(50))));
 	
 		PageId pId0 = DiskManager.getSingleton().allocPage();
-		ByteBuffer buffW = BufferManager.getSingleton().getPage(pId0);
 	
 		Record record = new Record(user);
 		record.addRecValues(

@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import up.mi.bdda.hcg.main.page.HeaderPage;
-import up.mi.bdda.hcg.main.page.PageId;
 
 /**
  * Cette classe doit stocker les informations de schéma de la relation, c’est à

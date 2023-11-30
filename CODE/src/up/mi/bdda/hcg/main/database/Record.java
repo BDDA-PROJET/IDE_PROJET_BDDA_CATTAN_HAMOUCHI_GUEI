@@ -7,7 +7,15 @@ import java.util.function.Consumer;
 
 public class Record {
   TableInfo tabInfo;
+  
+  
+  
   List<Field> recvalues;
+
+  public TableInfo getTabInfo() {
+    return tabInfo;
+  }
+
 
   public Record(TableInfo tabInfo) {
     this.tabInfo = tabInfo;
@@ -149,4 +157,20 @@ public class Record {
 
     return str;
   }
+
+/**
+ * Get the size of the record.
+ *
+ * @return The size of the record in bytes.
+ */
+public int size() {
+  int recordSize = 0;
+  
+  for (Field field : recvalues) {
+    recordSize += field.size();
+  }
+  recordSize+= (tabInfo.getNombreColonne()+1)*4;
+  
+  return recordSize;
+}
 }

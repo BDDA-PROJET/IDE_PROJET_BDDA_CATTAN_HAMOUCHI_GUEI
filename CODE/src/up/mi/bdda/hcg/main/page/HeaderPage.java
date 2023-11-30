@@ -2,7 +2,7 @@ package up.mi.bdda.hcg.main.page;
 
 import java.nio.ByteBuffer;
 
-public class HeaderPage {
+public class HeaderPage extends PageId{
   ByteBuffer buff;
 
   public HeaderPage(ByteBuffer buff) {
