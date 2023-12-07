@@ -40,10 +40,15 @@ public final class FileManager {
   }
 
   public PageId getFreeDataPageId(TableInfo ti, int sizeRecord){
-     DataPage dp = new DataPage(ti.getHeaderPageId().getFreePageId());
-      if(dp.getSlot().getOffsetFreeSpace() >= sizeRecord){
-        PageId p = dp.getPageId();
-        if(p.isValid()){return p;}
+    PageId p = ti.getHeaderPageId().getFreePageId();
+    ByteBuffer buff = BManager.getSingleton().getPage(p);
+    DataPage dp = new DataPage(buff);
+    int sum = 4096 -(8+2*4+(dp.getNbRecords()*2)*4);
+    for(int i = 0; i < dp.getNbRecords(); i++){
+      sum -= dp.getTailleRecord(i);
+    }
+      if(sum >= sizeRecord){
+          if(p.isValid()){return p;}
         }
     return null;
   
@@ -51,32 +56,39 @@ public final class FileManager {
 
 
   public RecordId writeRecordToDataPage(Record r, PageId p){
-    DataPage dp = new DataPage(p);
-    dp.getRecords().add(r);
-    int size = r.writeToBuffer(BManager.getSingleton().getPage(p),dp.getSlot().getOffsetFreeSpace());
-    dp.getSlot().getCellsDirectory().add(dp.getSlot().getOffsetFreeSpace());
-    dp.getSlot().getCellsDirectory().add(size);
-    r.writeToBuffer(BManager.getSingleton().getPage(p),dp.getSlot().getOffsetFreeSpace());
-    dp.setFreeSpace(size);
-    RecordId rid = new RecordId(p,dp.getSlot().getId());
-    if(dp.getSlot().getOffsetFreeSpace() == 0){
-      HeaderPage hp = new HeaderPage(BManager.getSingleton().getPage(p));
-      hp.setFullPageId(p.clone());
-    }
-    BManager.getSingleton().freePage(p,true);
+    //on récupère la dataPage correspondant à la page donnée en argument
+    ByteBuffer buff = BManager.getSingleton().getPage(p);
+    DataPage dataPage = new DataPage(buff) ;
+
+    //on défini la position du dernier record ecrit dans la DataPage
+    int posDernierRec = dataPage.getTailleRecord(dataPage.getNbRecords()-1) +1 ;
+
+    //on écrit le record dans la DataPage a la bonne position
+    int offset = r.writeToBuffer(buff , dataPage.getPosDebutRecord(dataPage.getNbRecords()-1+ posDernierRec ));
+    dataPage.setOffsetDeb(offset);
+    dataPage.setFreeSpace(offset);
+    RecordId rid = new RecordId(p, dataPage.getNbRecords());
     return rid;
   }
 
+
   public PageId addDataPage(TableInfo tableInfo) {
-
-    ByteBuffer buff = BufferManager.getSingleton().getPage(tableInfo.getHeaderPageId());
-
-    HeaderPage hp = new HeaderPage(buff);
-
+    //on récupère la HeaderPage de la tableInfo
+    HeaderPage hp = tableInfo.getHeaderPageId();
     PageId datPageId = DiskManager.getSingleton().allocPage();
+    ByteBuffer buff = BManager.getSingleton().getPage(datPageId);
+    //on alloue une nouvelle Page
 
-    DataPage dataPage = new DataPage(datPageId);
+    //on créer une DataPage avec la page nouvellement allouée.
+    DataPage dataPage = new DataPage(buff);
 
+    //on note cette page dans la liste des FreePageId de la HeaderPage
+    if(hp.getFreePageId().isValid()){
+      dataPage.setNextPageId(new PageId(-1,-1));
+      hp.setFreePageId(datPageId);
+      hp.addListFreePage(datPageId);
+    }
+    hp.addListFreePage(datPageId);
     dataPage.setNextPageId(hp.getFreePageId().clone());
     hp.setFreePageId(datPageId);
 
@@ -87,25 +99,25 @@ public final class FileManager {
 
   }
 
-  List<Record> getRecordsInDataPage(TableInfo tabInfo, PageId pageId) {
-
+  public List<Record> getRecordsInDataPage(TableInfo tabInfo, PageId pageId) {
+    //on récupère la dataPage correspondant à la page donnée en argument
     ByteBuffer buff = BufferManager.getSingleton().getPage(pageId);
-    DataPage dataPage = new DataPage(pageId);
+    DataPage dataPage = new DataPage(buff);
 
+    //on créer une liste de record pour les récupérer
     ArrayList<Record> records = new ArrayList<>();
-
-
-      for (int i = 0; i< dataPage.getRecords().size();i++){
+    int offset = 8;
+      for (int i = 0; i< dataPage.getNbRecords();i++){
       Record unRecord = new Record(tabInfo);
-      unRecord = dataPage.getRecords().get(i);
+      offset = unRecord.readFromBuffer(buff, offset);
+
       records.add(unRecord);
-      
       }
     BufferManager.getSingleton().freePage(pageId, false);
     return records;
   }
 
-  List<PageId> getDataPages(TableInfo tabInfo) {
+  public List<PageId> getDataPages(TableInfo tabInfo) {
     // creer une liste de pages
     ArrayList<PageId> pages = new ArrayList<>();
     //creer un objet headerpage de la table info 
@@ -151,7 +163,7 @@ public final class FileManager {
     return pages;  
   }
 
-  RecordId InsertRecordIntoTable ( Record record ) {
+  public RecordId insertRecordIntoTable ( Record record ) {
 
     PageId pageId = getFreeDataPageId(record.getTabInfo(), record.size());
     ByteBuffer buff = BManager.getSingleton().getPage(pageId);
@@ -168,7 +180,7 @@ public final class FileManager {
 
     }
 
-    List<Record> GetAllRecords (TableInfo tabInfo) {
+    public List<Record> getAllRecords (TableInfo tabInfo) {
       // une liste vide pour les reccord
       ArrayList<Record> records = new ArrayList<>();
 // recuperer le headerpage de la table info et la freepageId disponible a lire 
@@ -192,11 +204,11 @@ public final class FileManager {
 
      // recupere la taille du record i 
      int tailleRecord = dataPage.getTailleRecord(i);
-     // on se position au debut de la recorde pour lire 
+     // on se position au debut de la record pour lire 
      buff.position(posDebRecord);
     //!\ on  ne sais pas ou s'arreter si on lit un record 
      unRecord.readFromBuffer(buff, posDebRecord);
-      records.add(unRecord);
+     records.add(unRecord);
       
       }
 

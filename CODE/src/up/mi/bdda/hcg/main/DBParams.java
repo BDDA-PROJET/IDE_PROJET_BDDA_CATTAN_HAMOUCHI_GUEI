@@ -54,5 +54,13 @@ public class DBParams {
         });
 
 		FileManager.getSingleton().writeRecordToDataPage(record, pId0);
+		FileManager.getSingleton().createNewHeaderPage();
+		FileManager.getSingleton().addDataPage(user);
+		FileManager.getSingleton().getFreeDataPageId(user, record.size());
+		//FileManager.getSingleton().getAllRecords(user);
+		FileManager.getSingleton().getRecordsInDataPage(user, pId0);
+		FileManager.getSingleton().getDataPages(user);
+		FileManager.getSingleton().insertRecordIntoTable(record);
+
 	}
 }

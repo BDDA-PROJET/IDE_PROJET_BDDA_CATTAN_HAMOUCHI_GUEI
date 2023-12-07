@@ -1,27 +1,16 @@
 package up.mi.bdda.hcg.main.page;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import up.mi.bdda.hcg.main.DBParams;
-import up.mi.bdda.hcg.main.database.Record;
 
-public class DataPage {
-  private int freeSpace;
-  private ByteBuffer buff;
-
- /*  public DataPage(PageId pageId) {
-    this.pageId = pageId;
-    nextPageId = new PageId(-1, -1);
-    records = new ArrayList<>();
-    slot = new Slot(2*4, 5); //nbCells choisi de manière arbitraire
-    freeSpace = 8;
-  }*/
-
-  public DataPage(ByteBuffer buff) {
-    this.buff = buff;
-    this.freeSpace = DBParams.SGBDPageSize;
+public class DataPage2 {
+      ByteBuffer buff;
+      int freeSpace;
+    
+      public DataPage2(ByteBuffer buff) {
+        this.buff = buff;
+        this.freeSpace = buff.capacity();
   }
 
   public void setOffsetDeb(int reste){
@@ -29,10 +18,6 @@ public class DataPage {
     buff.putInt(reste);
   }
 
-  public void setNextPageId(PageId nextPageId) {
-    buff.putInt(nextPageId.getFileIdx());
-    buff.putInt(nextPageId.getPageIdx());
-    }
 
    public PageId getNextPageId() {
     buff.position(0);
@@ -76,4 +61,30 @@ public class DataPage {
   public int getFreeSpace(){
     return freeSpace;
   }
-}
+
+  
+  public void setNextPageId(PageId nextPageId) {
+    buff.position(0);
+    buff.putInt(nextPageId.getFileIdx());
+    buff.putInt(nextPageId.getPageIdx());
+    }
+    
+      public void setFreePageId(PageId pageId) {
+        buff.putInt(0, pageId.getFileIdx());
+        buff.putInt(4, pageId.getPageIdx());
+      }
+    
+      public void setFullPageId(PageId pageId) {
+        buff.putInt(8, pageId.getFileIdx());
+        buff.putInt(12, pageId.getPageIdx());
+      }
+    
+      public PageId getFreePageId() {
+        return new PageId(buff.getInt(0), buff.getInt(4));
+      }
+    
+      public PageId getFullPageId() {
+        return new PageId(buff.getInt(8), buff.getInt(12));
+      }
+    }
+    
