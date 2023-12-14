@@ -16,8 +16,8 @@ public class InsertCommand implements Command {
   }
 
   private void init(String[] queries) {
-    resourceName = queries[2];
-    values = queries[4].substring(1, queries[4].length() - 1).split(",");
+    resourceName = queries[0];
+    values = queries[2].substring(1, queries[2].length() - 1).split(",");
   }
 
   @Override
