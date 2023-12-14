@@ -20,9 +20,11 @@ public class ImportCommand implements Command{
     
     private String resourceName;
   private Collection<ColumnInfo> columns;
+  private String chemin;
 
   public ImportCommand(String[] args) {
     columns = new ArrayList<>();
+    chemin = args[1];
     init(args);
   }
 
@@ -30,23 +32,19 @@ public class ImportCommand implements Command{
     resourceName = queries[0];
   }
 
-  public void execute(String chemin) throws IOException {
+  @Override
+public void execute() throws IOException {
     TableInfo ti = DatabaseManager.getSingleton().getDatabaseInfo().getTableInfo(resourceName);
     
     try (BufferedReader bufR = new BufferedReader(new FileReader(chemin))) {
         String line = null;
         while ((line = bufR.readLine()) != null) {
             Record record = new Record(ti);
-            String [] values = line.split(",");
+            Object [] values = line.split(",");
             record.addValues(values);
             FileManager.getSingleton().insertRecordIntoTable(record);
   }
+  bufR.close();
 }
-}
-
-@Override
-public void execute() throws IOException {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'execute'");
 }
 }
