@@ -19,6 +19,12 @@ public interface Command {
       case "RESET":
         new ResetDBCommand().execute();
         break;
+      case "IMPORT" :
+        new ImportCommand(args).execute(args[1]);
+        break;
+      case "DELETE" :
+        new DeleteCommand(args).execute();
+        break;
       default:
         System.out.println("Unknown command");
         break;
