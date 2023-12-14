@@ -21,8 +21,8 @@ public class CreateTableCommand implements Command {
   }
 
   private void init(String[] queries) {
-    resourceName = queries[2];
-    String[] columns = queries[3].substring(1, queries[3].length() - 1).split(",");
+    resourceName = queries[0];
+    String[] columns = queries[1].substring(1, queries[1].length() - 1).split(",");
     for (String column : columns) {
       String[] columnInfo = column.split(":");
       this.columns.add(new ColumnInfo(columnInfo[0], Type.of(columnInfo[1])));

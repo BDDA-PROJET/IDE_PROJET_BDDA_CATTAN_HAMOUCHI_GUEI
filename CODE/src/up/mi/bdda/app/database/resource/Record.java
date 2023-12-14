@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import up.mi.bdda.app.database.commands.Filtre;
+
 public class Record {
   private TableInfo resource;
   private Map<String, Field> values;
@@ -192,4 +194,8 @@ public class Record {
     record.addValues(values);
     return record;
   }
+
+public Map<String, Field> fields() {
+    return values;
+}
 }
