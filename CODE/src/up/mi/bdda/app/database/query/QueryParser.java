@@ -30,7 +30,10 @@ public class QueryParser {
       command = "RESET";
     } else if (this.query.startsWith("DELETE")){
       command = "DELETE";
-      query = this.query.substring(14);
+      query = this.query.substring(12);
+    } else if(this.query.startsWith("IMPORT INTO")){
+      command = "IMPORT";
+      query = this.query.substring(12);
     }
     else {
       throw new IllegalArgumentException("Unknown query type");

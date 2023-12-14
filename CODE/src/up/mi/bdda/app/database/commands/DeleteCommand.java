@@ -47,18 +47,6 @@ public class DeleteCommand implements Command {
     }
 
 
-  private void printRecords(Collection<Record> records) {
-    if (records.isEmpty()) {
-      System.out.println("No records found");
-      return;
-    }
-
-    for (Record record : records) {
-      System.out.println(record);
-    }
-    System.out.println(String.format("Total records: %d", records.size()));
-  }
-
   @Override
   public void execute() throws IOException {
 
