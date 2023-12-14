@@ -13,7 +13,7 @@ public class FLOAT implements Type {
 
   @Override
   public boolean isInstance(Object value) {
-    return value instanceof Float || value instanceof String && ((String) value).matches("-?\\d+\\.\\d+");
+    return value instanceof Float || value instanceof String && ((String) value).matches("-?\\d+(\\.\\d+)?");
   }
 
   @Override

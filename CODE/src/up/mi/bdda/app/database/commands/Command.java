@@ -20,7 +20,7 @@ public interface Command {
         new ResetDBCommand().execute();
         break;
       case "IMPORT" :
-        new ImportCommand(args).execute(args[1]);
+        new ImportCommand(args).execute();
         break;
       case "DELETE" :
         new DeleteCommand(args).execute();
