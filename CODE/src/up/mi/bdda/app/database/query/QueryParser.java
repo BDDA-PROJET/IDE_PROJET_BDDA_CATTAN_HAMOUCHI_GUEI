@@ -28,7 +28,11 @@ public class QueryParser {
       query = this.query.substring(14);
     } else if (this.query.startsWith("RESETDB")) {
       command = "RESET";
-    } else {
+    } else if (this.query.startsWith("DELETE")){
+      command = "DELETE";
+      query = this.query.substring(14);
+    }
+    else {
       throw new IllegalArgumentException("Unknown query type");
     }
     return new BasicQuery(command,query);
