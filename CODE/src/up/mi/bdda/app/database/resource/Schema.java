@@ -55,4 +55,15 @@ public class Schema {
   public String toString() {
     return String.format("Schema(%s, %s)", resource.name(), columns);
   }
+
+  public ColumnInfo getColumn(String field) {
+    Iterator<ColumnInfo> schemaIterator = columns.iterator();
+    while (schemaIterator.hasNext()) {
+      ColumnInfo column = schemaIterator.next();
+      if (column.name().equals(field)) {
+        return column;
+      }
+    }
+    return null;
+  }
 }

@@ -2,8 +2,6 @@ package up.mi.bdda.app.database.query;
 
 import java.io.IOException;
 
-import javax.print.DocFlavor.STRING;
-
 import up.mi.bdda.app.database.commands.Command;
 
 public class QueryParser {
@@ -14,12 +12,12 @@ public class QueryParser {
   }
 
   public Query parse() throws IllegalArgumentException {
-      String command = "";
-      String query = ""; 
-      if (this.query.startsWith("CREATE TABLE")) {
+    String command = "";
+    String query = "";
+    if (this.query.startsWith("CREATE TABLE")) {
       command = "CREATE";
       query = this.query.substring(13);
-      
+
     } else if (this.query.startsWith("INSERT INTO")) {
       command = "INSERT";
       query = this.query.substring(12);
@@ -38,7 +36,7 @@ public class QueryParser {
     else {
       throw new IllegalArgumentException("Unknown query type");
     }
-    return new BasicQuery(command,query);
+    return new BasicQuery(command, query);
   }
 }
 
@@ -56,10 +54,9 @@ class BasicQuery implements Query {
     // Here you would execute the query against your database.
     // This is a simplified example, in a real-world application you would use a
     // library like JDBC to execute the query.
-    System.out.println(String.format("Executing query: %s %s", command,query ));
 
     String[] queries = query.split(" ");
 
-    Command.execute(command,queries);
+    Command.execute(command, queries);
   }
 }

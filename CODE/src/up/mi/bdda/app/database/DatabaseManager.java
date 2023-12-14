@@ -35,6 +35,7 @@ public class DatabaseManager {
   public void processQuery(String query) throws Exception {
     QueryParser parser = new QueryParser(query);
     Query queryObject = parser.parse();
+    System.out.println(String.format("Executing query: %s", query));
     queryObject.execute();
   }
 
