@@ -2,7 +2,6 @@ package up.mi.bdda.app.page;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-<<<<<<< HEAD
 import java.util.Collection;
 import java.util.List;
 
@@ -36,32 +35,10 @@ public class SlotDirectory {
    * start positions list to an empty list.
    */
   public SlotDirectory() {
+
     freeSpaceIndex = 8;
     entryCount = 0;
     recordStartPositions = new ArrayList<>();
-=======
-import java.util.List;
-
-/**
- * Class representing a Slot Directory.
- */
-public class SlotDirectory {
-  // Position (byte) at which the free space on the page (=where records can be
-  // added)
-  private int freeSpacePointer;
-  // Number of cells in the directory
-  private int numberOfCells;
-  // Start position (byte) in the page of each record
-  private List<int[]> recordPositions; // [recordIdx][start/size]
-
-  /**
-   * Constructor for SlotDirectory.
-   */
-  public SlotDirectory() {
-    freeSpacePointer = 8;
-    numberOfCells = 0;
-    recordPositions = new ArrayList<>();
->>>>>>> 5df7839 (query in process)
   }
 
   /**
