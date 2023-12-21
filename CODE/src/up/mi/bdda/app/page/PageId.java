@@ -3,76 +3,43 @@ package up.mi.bdda.app.page;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
-import up.mi.bdda.app.DBParams;
-import up.mi.bdda.app.utils.FileUtility;
+import up.mi.bdda.app.settings.DBParams;
+import up.mi.bdda.app.utils.FileHandler;
 
 /**
- * This Java class represents a page identifier. It is used to uniquely identify
- * a page within a file. The {@link PageId} class has two main properties:
- * {@link #fileIdx} and {@link #pageIdx}, which represent the file index and the
- * page index, respectively.
- * <p>
- * Here's a brief description of the methods in this class:
- * <ul>
- * <li>{@link #PageId()} - This is the default constructor that reset the
- * {@link #fileIdx} and {@link #pageIdx} to -1.
- * <li>{@link #PageId(int, int)} - This is a constructor that sets the
- * {@link #fileIdx} and {@link #pageIdx} to the provided values.
- * <li>{@link #getFileIdx()} and {@link #getPageIdx()} - These methods return
- * the file index and page index respectively.
- * <li>{@link #setFileIdx(int)} and {@link #setPageIdx(int)} - These methods set
- * the file index and page index respectively.
- * <li>{@link #set(int, int)} - This method sets both the file index and the
- * page index.
- * <li>{@link #set(PageId)} - This method sets the {@link #fileIdx} and
- * {@link #pageIdx} based on another {@link PageId} object.
- * <li>{@link #reset()} - This method resets the {@link #fileIdx} and
- * {@link #pageIdx} to -1.
- * <li>{@link #clone()} - this method creates and returns a copy of the
- * {@link PageId} object.
- * <li>{@link #toString()} - This method returns a string representation of the
- * {@link PageId} object.
- * <li>{@link #equals(Object)} - This method checks if the current
- * {@link PageId} object is equal to another {@link PageId} object.
- * <li>{@link #isValid()} - This method checks if the {@link #fileIdx} and
- * {@link #pageIdx} are valid (i.e, greater than -1).
- * <li>{@link #next()} - This method calculates the next page identifier based
- * on the current {@link fileIdx} and {@link pageIdx}.
- * <li>{@link #getFilePath()} - This method constructs a file path based on the
- * {@link #fileIdx}.
- * <li>{@link #getAccessFile()} - This method opens and returns a
- * {@link RandomAccessFile} object for the file at the path returned by
- * {@link #getFilePath()}.
- * <li>{@link #createFile()} - This method is responsible for creating a new
- * file based on the page identifier.
- * </ul>
+ * The PageId class represents a unique identifier for a page in a file.
+ * It implements Cloneable and Serializable interfaces for object cloning and
+ * serialization.
  */
-public class PageId implements Cloneable {
+public class PageId implements Cloneable, Serializable {
 
-  /** The file index. */
+  /**
+   * The index of the file.
+   */
   private int fileIdx;
 
-  /** The page index. */
+  /**
+   * The index of the page within the file.
+   */
   private int pageIdx;
 
   /**
-   * Default constructor. It resets the {@link #fileIdx} and {@link #pageIdx} to
-   * -1.
+   * Default constructor that resets the indexes.
    */
   public PageId() {
-    reset();
+    resetIndexes();
   }
 
   /**
-   * This is a constructor that sets the {@link #fileIdx} and {@link #pageIdx} to
-   * the provided values.
-   * 
-   * @param fileIdx the file index value
-   * @param pageIdx the page index value
+   * Constructor that sets the file and page indexes.
+   *
+   * @param fileIdx The index of the file.
+   * @param pageIdx The index of the page within the file.
    */
   public PageId(int fileIdx, int pageIdx) {
     this.fileIdx = fileIdx;
@@ -80,29 +47,28 @@ public class PageId implements Cloneable {
   }
 
   /**
-   * This method returns the file index.
-   * 
-   * @return the file index value
+   * Returns the file index.
+   *
+   * @return The file index.
    */
   public int getFileIdx() {
     return fileIdx;
   }
 
   /**
-   * This method returns the page index.
-   * 
-   * @return the page index value
+   * Returns the page index.
+   *
+   * @return The page index.
    */
   public int getPageIdx() {
     return pageIdx;
   }
 
   /**
-   * This method sets the file index.
-   * 
-   * @param fileIdx the file index value to set
-   * 
-   * @throws IllegalArgumentException if the file index is negative
+   * Sets the file index.
+   *
+   * @param fileIdx The new file index.
+   * @throws IllegalArgumentException If the file index is negative.
    */
   public void setFileIdx(int fileIdx) throws IllegalArgumentException {
     if (fileIdx < 0) {
@@ -112,11 +78,10 @@ public class PageId implements Cloneable {
   }
 
   /**
-   * This method sets the page index.
-   * 
-   * @param pageIdx the page index value to set
-   * 
-   * @throws IllegalArgumentException if the page index is negative
+   * Sets the page index.
+   *
+   * @param pageIdx The new page index.
+   * @throws IllegalArgumentException If the page index is negative.
    */
   public void setPageIdx(int pageIdx) {
     if (pageIdx < 0) {
@@ -126,50 +91,43 @@ public class PageId implements Cloneable {
   }
 
   /**
-   * This method sets both the file index and the page index.
-   * 
-   * @param fileIdx the file index value to set
-   * @param pageIdx the page index value to set
-   * 
-   * @throws IllegalArgumentException if the file index or page index is negative
+   * Sets the file and page indexes.
+   *
+   * @param fileIdx The new file index.
+   * @param pageIdx The new page index.
+   * @throws IllegalArgumentException If any of the indexes is negative.
    */
-  public void set(int fileIdx, int pageIdx) throws IllegalArgumentException {
+  public void setIndexes(int fileIdx, int pageIdx) throws IllegalArgumentException {
     setFileIdx(fileIdx);
     setPageIdx(pageIdx);
   }
 
   /**
-   * This method sets the {@link #fileIdx} and {@link #pageIdx} based on another.
-   * 
-   * @param pageId the {@link PageId} object to set
-   * 
-   * @throws IllegalArgumentException if the {@link PageId} object is {@code null}
-   *                                  or {@code invalid}
+   * Sets the file and page indexes based on another PageId object.
+   *
+   * @param pageIdentifier The PageId object to copy the indexes from.
+   * @throws IllegalArgumentException If the PageId object is invalid.
    */
-  public void set(PageId pageId) {
-    if (!pageId.isValid()) {
+  public void setIndexes(PageId pageIdentifier) {
+    if (!pageIdentifier.isValid()) {
       throw new IllegalArgumentException("Invalid PageId object");
     }
-    this.fileIdx = pageId.fileIdx;
-    this.pageIdx = pageId.pageIdx;
+    this.fileIdx = pageIdentifier.fileIdx;
+    this.pageIdx = pageIdentifier.pageIdx;
   }
 
   /**
-   * This method resets the {@link #fileIdx} and {@link #pageIdx} to -1 if they
-   * are not already -1.
-   *
-   * @return {@code true} if the reset was successful, {@code false} otherwise
+   * Resets the file and page indexes to -1.
    */
-  public void reset() {
+  public void resetIndexes() {
     fileIdx = -1;
     pageIdx = -1;
   }
 
   /**
-   * This method returns a string representation of the {@link PageId} object.
-   * The string includes the file index and page index.
+   * Returns a string representation of the PageId object.
    *
-   * @return a string representation of the {@link PageId} object
+   * @return A string in the format "fileIdx.pageIdx".
    */
   @Override
   public String toString() {
@@ -177,7 +135,10 @@ public class PageId implements Cloneable {
   }
 
   /**
-   * This method creates and returns a copy of the {@link PageId} object.
+   * Creates and returns a copy of this PageId object.
+   *
+   * @return A clone of this PageId object.
+   * @throws RuntimeException If the object cannot be cloned.
    */
   @Override
   public final PageId clone() {
@@ -193,11 +154,11 @@ public class PageId implements Cloneable {
   }
 
   /**
-   * Checks if the current {@link PageId} object is equal to another.
+   * Checks if this PageId object is equal to another object.
    *
-   * @param obj the object to compare with the current {@link PageId} object.
-   * @return {@code true} if the current {@link PageId} object is equal to the
-   *         other {@link PageId} object, {@code false} otherwise.
+   * @param obj The object to compare with.
+   * @return true if the objects are the same or if the other object is a PageId
+   *         with the same indexes, false otherwise.
    */
   @Override
   public final boolean equals(Object obj) {
@@ -208,33 +169,37 @@ public class PageId implements Cloneable {
     if (!(obj instanceof PageId)) {
       return false;
     }
-    PageId otherPageId = (PageId) obj;
+    PageId otherPageIdentifier = (PageId) obj;
 
-    return Objects.equals(this.fileIdx, otherPageId.fileIdx)
-        && Objects.equals(this.pageIdx, otherPageId.pageIdx);
+    return Objects.equals(this.fileIdx, otherPageIdentifier.fileIdx)
+        && Objects.equals(this.pageIdx, otherPageIdentifier.pageIdx);
   }
 
+  /**
+   * Returns a hash code value for the object.
+   *
+   * @return A hash code value for this object.
+   */
   @Override
   public final int hashCode() {
     return Objects.hash(fileIdx, pageIdx);
   }
 
   /**
-   * This method checks if the {@link #fileIdx} and {@link #pageIdx} are valid.
-   * 
-   * @return {@code true} if the {@link #fileIdx} and {@link #pageIdx} are valid,
-   *         {@code false} otherwise
+   * Checks if the PageId object is valid.
+   *
+   * @return true if both file and page indexes are non-negative, false otherwise.
    */
   public boolean isValid() {
     return fileIdx >= 0 && pageIdx >= 0;
   }
 
   /**
-   * This method calculates the next page identifier based on the current
-   * {@link fileIdx} and {@link pageIdx}.
+   * Increments the file index by 1 and the page index by 1 if the file index is
+   * reset to 0.
    */
-  public void next() {
-    int nextFileId = (fileIdx + 1) % DBParams.DMFFileCount;
+  public void nextIndex() {
+    int nextFileId = (fileIdx + 1) % DBParams.maxFileCount;
     int nextPageId = nextFileId > 0 ? pageIdx : pageIdx + 1;
 
     fileIdx = nextFileId;
@@ -242,15 +207,13 @@ public class PageId implements Cloneable {
   }
 
   /**
-   * This method constructs a file path based on the file index (fileIdx). It uses
-   * DBParams.DBPath as the base directory and the file name is formatted as
-   * {@code F%d.data} where %d is the file index.
-   * 
-   * @throws FileNotFoundException if the file does not exist at the constructed
-   *                               path
+   * Returns the path of the file with the current file index.
+   *
+   * @return The path of the file.
+   * @throws FileNotFoundException If the file does not exist.
    */
   public Path getFilePath() throws FileNotFoundException {
-    Optional<Path> filePath = FileUtility.getFilePath(fileIdx);
+    Optional<Path> filePath = FileHandler.retrieveFilePath(fileIdx);
     if (!filePath.isPresent()) {
       throw new FileNotFoundException("File does not exist: " + filePath.toString());
     }
@@ -258,13 +221,14 @@ public class PageId implements Cloneable {
   }
 
   /**
-   * This method opens and returns a RandomAccessFile for the file based on the
-   * page identifier.
-   * 
-   * @throws IOException if an {@link IOException} occurs during the operation
+   * Returns a RandomAccessFile object for the file with the current file and page
+   * indexes.
+   *
+   * @return A RandomAccessFile object for the file.
+   * @throws IOException If the file cannot be accessed.
    */
   public RandomAccessFile getAccessFile() throws IOException {
-    Optional<RandomAccessFile> file = FileUtility.getAccessFile(fileIdx, pageIdx);
+    Optional<RandomAccessFile> file = FileHandler.retrieveAccessFile(fileIdx, pageIdx);
     if (!file.isPresent()) {
       throw new IOException(String.format("Failed to get access file for page identifier: %d.%d", fileIdx, pageIdx));
     }
@@ -272,12 +236,11 @@ public class PageId implements Cloneable {
   }
 
   /**
-   * This method is responsible for creating a new file based on the page
-   * identifier.
-   * 
-   * @throws IOException if an {@link IOException} occurs during the operation
+   * Creates a new file with the current file index.
+   *
+   * @throws IOException If the file cannot be created.
    */
   public void createFile() throws IOException {
-    FileUtility.createFile(fileIdx);
+    FileHandler.generateFile(fileIdx);
   }
 }

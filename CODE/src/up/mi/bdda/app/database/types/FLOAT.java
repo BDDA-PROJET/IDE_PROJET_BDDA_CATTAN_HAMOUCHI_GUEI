@@ -1,6 +1,11 @@
 package up.mi.bdda.app.database.types;
 
-public class FLOAT implements Type {
+/**
+ * FLOAT class represents a floating-point number data type in the database.
+ * It implements the DataType interface.
+ */
+public class FLOAT implements DataType {
+
   @Override
   public String name() {
     return "FLOAT";
@@ -19,5 +24,15 @@ public class FLOAT implements Type {
   @Override
   public Object parse(String value) {
     return Float.parseFloat(value);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof FLOAT;
+  }
+
+  @Override
+  public String toString() {
+    return "FLOAT";
   }
 }

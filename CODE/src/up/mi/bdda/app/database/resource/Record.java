@@ -7,193 +7,261 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
+/**
+ * The Record class represents a single record in a database table.
+ * It contains information about the table it belongs to, its values, and its
+ * size.
+ */
 public class Record {
+
+  /**
+   * Information about the table this record belongs to.
+   */
   private TableInfo resource;
-  private Map<String, Field> values;
+
+  /**
+   * The values of this record, mapped by field name.
+   */
+  private Map<String, DataElement> values;
+
+  /**
+   * The size of this record in bytes.
+   */
   private int size;
 
+  /**
+   * The unique identifier of this record.
+   */
+  private RecordId recordId;
+
+  /**
+   * Constructs a new Record for the given table.
+   *
+   * @param resource Information about the table this record belongs to.
+   */
   public Record(TableInfo resource) {
     this.resource = resource;
     values = new HashMap<>();
     size = 0;
+    recordId = null;
   }
 
+  /**
+   * Adds values to this record.
+   *
+   * @param values The values to add.
+   * @throws IllegalArgumentException If the values are invalid for the table
+   *                                  scheme.
+   */
   public void addValues(Object... values) {
     Collection<Object> valuesCollection = new ArrayList<>(List.of(values));
-    // check if the values respect the schema of the resource
-    if (!resource.schema().validate(valuesCollection)) {
+    if (!resource.scheme().validateValues(valuesCollection)) {
       throw new IllegalArgumentException(String.format("Invalid values for resource: %s", resource.name()));
     }
-    // the values are valid, so clear the current values of the record
     this.values.clear();
 
-    // create record fields based on resource schema
     Iterator<Object> valuesIterator = valuesCollection.iterator();
-    Iterator<ColumnInfo> schemaIterator = resource.schema().iterator();
-    while (valuesIterator.hasNext() && schemaIterator.hasNext()) {
-      // get the column and the value associated with it
-      ColumnInfo column = schemaIterator.next();
+    Iterator<FieldInfo> schemeIterator = resource.scheme().fields.iterator();
+    while (valuesIterator.hasNext() && schemeIterator.hasNext()) {
+      FieldInfo field = schemeIterator.next();
       Object value = valuesIterator.next();
-      // create a new field with the column type and the value
-      Field field = new Field(column.type(), value);
-      // add the field to the record
-      this.values.putIfAbsent(column.name(), field);
-      // update the size of the record
-      size += field.size();
+      DataElement dataElement = new DataElement(field.type, value);
+      this.values.putIfAbsent(field.name, dataElement);
+      size += dataElement.length;
     }
-    size += (resource.schema().size() + 1) * 4;
+    size += (resource.scheme().fields.size() + 1) * 4;
   }
 
-  public interface Consumer<T> {
-    void accept(T t);
-  }
-
+  /**
+   * Applies a consumer function to each field of this record, with the field's
+   * offset as argument.
+   *
+   * @param initialOffset The initial offset.
+   * @param consumer      The consumer function to apply.
+   * @return The final offset after applying the consumer function to all fields.
+   */
   private int applyOffsetToEachField(int initialOffset, Consumer<Integer> consumer) {
-    // the offset of the first value
-    int offset = initialOffset + (resource.schema().size() + 1) * 4;
-    // iterate over the schema
-    Iterator<ColumnInfo> schemaIterator = resource.schema().iterator();
-    while (schemaIterator.hasNext()) {
-      // call the consumer with the offset
+    int offset = initialOffset + (resource.scheme().fields.size() + 1) * 4;
+    Iterator<FieldInfo> schemeIterator = resource.scheme().fields.iterator();
+    while (schemeIterator.hasNext()) {
       consumer.accept(offset);
 
-      // there is a column, so get associated field
-      ColumnInfo column = schemaIterator.next();
-      if (values.size() == resource.schema().size()) {
-        Field field = values.get(column.name());
-        // increment the offset
-        offset += field.size();
+      FieldInfo field = schemeIterator.next();
+      if (values.size() == resource.scheme().fields.size()) {
+        DataElement dataElement = values.get(field.name);
+        offset += dataElement.length;
       }
     }
-    // call the consumer with the last offset
     consumer.accept(offset);
-
-    // return current position in the buffer
     return offset;
   }
 
-  public int write(ByteBuffer buff, int position) {
-    // set buffer position
+  /**
+   * Writes the data of this record to a ByteBuffer.
+   *
+   * @param buff     The ByteBuffer to write to.
+   * @param position The position in the ByteBuffer to start writing at.
+   * @return The offset in the ByteBuffer after writing.
+   */
+  public int writeDataToBuffer(ByteBuffer buff, int position) {
     buff.position(position);
-    // apply the offset to each field of the record and get the number of bytes
-    // written
     int writeOffset = applyOffsetToEachField(position, buff::putInt);
-
-    // iterate over the schema and offsets
-    Iterator<ColumnInfo> schemaIterator = resource.schema().iterator();
-    while (schemaIterator.hasNext()) {
-      ColumnInfo column = schemaIterator.next();
-      Field field = values.get(column.name());
-      switch (column.type().name()) {
+    Iterator<FieldInfo> schemeIterator = resource.scheme().fields.iterator();
+    while (schemeIterator.hasNext()) {
+      FieldInfo field = schemeIterator.next();
+      DataElement dataElement = values.get(field.name);
+      switch (field.type.name()) {
         case "INT":
-          buff.putInt((int) field.value());
+          buff.putInt((int) dataElement.content);
           break;
         case "FLOAT":
-          buff.putFloat((float) field.value());
+          buff.putFloat((float) dataElement.content);
           break;
         case "STRING":
         case "VARSTRING":
-          for (int i = 0; i < field.size(); i += 2) {
-            buff.putChar(field.value().toString().charAt(i / 2));
+          for (int i = 0; i < dataElement.length; i += 2) {
+            buff.putChar(dataElement.content.toString().charAt(i / 2));
           }
           break;
         default:
           throw new IllegalArgumentException(
-              String.format("Invalid type %s for column %s", column.type().name(), column.name()));
+              String.format("Invalid type %s for field %s", field.type.name(), field.name));
       }
     }
-    // return the number of bytes written
     return writeOffset;
   }
 
-  public int read(ByteBuffer buff, int position) {
-    // set buffer position
+  /**
+   * Reads the data of this record from a ByteBuffer.
+   *
+   * @param buff     The ByteBuffer to read from.
+   * @param position The position in the ByteBuffer to start reading at.
+   * @return The offset in the ByteBuffer after reading.
+   */
+  public int readDataFromBuffer(ByteBuffer buff, int position) {
     buff.position(position);
     List<Integer> offsets = new ArrayList<>();
-    // apply the offset to each field of the record and get the number of bytes read
     int readOffset = applyOffsetToEachField(position, (offset) -> offsets.add(buff.getInt()));
 
-    // reset the values
     values.clear();
 
-    // initialize the next offset to null
     Integer nextOffset = null;
-    // iterate over the schema and offsets
-    Iterator<ColumnInfo> schemaIterator = resource.schema().iterator();
+    Iterator<FieldInfo> schemeIterator = resource.scheme().fields.iterator();
     Iterator<Integer> offsetsIterator = offsets.iterator();
-    while (schemaIterator.hasNext() && offsetsIterator.hasNext()) {
-      // there is a column, and an offset, so use them to read the field value from
-      // the buffer
-      ColumnInfo column = schemaIterator.next();
+    while (schemeIterator.hasNext() && offsetsIterator.hasNext()) {
+      FieldInfo field = schemeIterator.next();
       Integer offset = nextOffset != null ? nextOffset : offsetsIterator.next();
-      switch (column.type().name()) {
+      switch (field.type.name()) {
         case "INT":
-          // add the field to the record
-          values.putIfAbsent(column.name(), new Field(column.type(), buff.getInt(offset)));
+          values.putIfAbsent(field.name, new DataElement(field.type, buff.getInt(offset)));
           nextOffset = null;
           break;
         case "FLOAT":
-          // add the field to the record
-          values.putIfAbsent(column.name(), new Field(column.type(), buff.getFloat(offset)));
+          values.putIfAbsent(field.name, new DataElement(field.type, buff.getFloat(offset)));
           nextOffset = null;
           break;
         case "STRING":
         case "VARSTRING":
-          // get the next offset
           nextOffset = offsetsIterator.next();
-          // create a string builder
           StringBuilder sb = new StringBuilder();
-          // iterate over the characters
           for (int i = 0; offset < (nextOffset - i); i += 2) {
-            // append the character to the string builder
             sb.append(buff.getChar(offset + i));
           }
-          // add the field to the record
-          values.putIfAbsent(column.name(), new Field(column.type(), sb.toString().trim()));
+          values.putIfAbsent(field.name, new DataElement(field.type, sb.toString()));
           break;
         default:
           throw new IllegalArgumentException(
-              String.format("Invalid type %s for column %s", column.type().name(), column.name()));
+              String.format("Invalid type %s for field %s", field.type.name(), field.name));
       }
     }
-    // return the number of bytes read
     return readOffset;
   }
 
+  /**
+   * Returns the size of this record in bytes.
+   *
+   * @return The size of this record in bytes.
+   */
   public int size() {
-    // the size of the record is number of bytes read or written from the buffer
     return size;
+  }
+
+  /**
+   * Returns information about the table this record belongs to.
+   *
+   * @return Information about the table this record belongs to.
+   */
+  public TableInfo resource() {
+    return resource;
+  }
+
+  /**
+   * Creates a new Record with the given values for the given table scheme.
+   *
+   * @param resourceScheme The table scheme to create the record for.
+   * @param values         The values for the new record.
+   * @return The new Record.
+   */
+  public static Record of(Scheme resourceScheme, Object[] values) {
+    Record record = new Record(resourceScheme.resource);
+    record.addValues(values);
+    return record;
+  }
+
+  /**
+   * Returns the names of the fields in this record.
+   *
+   * @return The names of the fields in this record.
+   */
+  public Set<String> getFields() {
+    return values.keySet();
+  }
+
+  /**
+   * Returns the value of the given field in this record.
+   *
+   * @param fieldName The name of the field to get the value of.
+   * @return The value of the given field in this record.
+   */
+  public Object getDataElement(String fieldName) {
+    return values.get(fieldName).content;
+  }
+
+  /**
+   * Returns the unique identifier of this record.
+   *
+   * @return The unique identifier of this record.
+   */
+  public RecordId getRecordId() {
+    return recordId;
+  }
+
+  /**
+   * Sets the unique identifier of this record.
+   *
+   * @param recordId The unique identifier to set.
+   */
+  public void setRecordId(RecordId recordId) {
+    this.recordId = recordId;
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    // sb.append("Record(");
-    Iterator<ColumnInfo> schemaIterator = resource.schema().iterator();
-    while (schemaIterator.hasNext()) {
-      ColumnInfo column = schemaIterator.next();
-      Field field = values.get(column.name());
-      sb.append(String.format("%s=%s", column.name(), field.value()));
-      if (schemaIterator.hasNext()) {
+    Iterator<FieldInfo> schemeIterator = resource.scheme().fields.iterator();
+    while (schemeIterator.hasNext()) {
+      FieldInfo field = schemeIterator.next();
+      DataElement dataElement = values.get(field.name);
+      Object value = dataElement.content instanceof String ? ((String) dataElement.content).trim()
+          : dataElement.content;
+      sb.append(String.format("%s=%s", field.name, value));
+      if (schemeIterator.hasNext()) {
         sb.append(" ; ");
       }
     }
-    // sb.append(")");
     return sb.toString();
-  }
-
-  public TableInfo getResource() {
-    return resource;
-  }
-
-  public static Record of(Schema userSchema, Object[] values) {
-    Record record = new Record(userSchema.resource());
-    record.addValues(values);
-    return record;
-  }
-
-  public Object get(String field) {
-    return values.get(field).value();
   }
 }

@@ -1,8 +1,22 @@
 package up.mi.bdda.app.database.types;
 
-public class STRING implements Type {
+/**
+ * STRING class represents the string data type in the database.
+ * It implements the DataType interface.
+ * The size of the string is defined at the time of object creation.
+ */
+public class STRING implements DataType {
+
+  /**
+   * The size of the STRING.
+   */
   private int size;
 
+  /**
+   * Constructor for the STRING class.
+   * 
+   * @param size The size of the string.
+   */
   public STRING(int size) {
     this.size = size;
   }
@@ -31,5 +45,19 @@ public class STRING implements Type {
   @Override
   public Object parse(String value) {
     return value;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof STRING)) {
+      return false;
+    }
+    STRING other = (STRING) obj;
+    return other.size == size;
+  }
+
+  @Override
+  public String toString() {
+    return String.format("STRING(%d)", size);
   }
 }

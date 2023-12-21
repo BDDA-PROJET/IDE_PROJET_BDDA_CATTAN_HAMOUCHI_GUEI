@@ -3,5 +3,5 @@
 	"java.project.outputPath": "./CODE/bin",
 	"java.project.referencedLibraries": ["./CODE/lib/**/*.jar"],
 	"java.debug.settings.vmArgs": "-ea",
-	"cSpell.words": ["bdda"]
+	"cSpell.words": ["bdda", "RESETDB", "VARSTRING"]
 }

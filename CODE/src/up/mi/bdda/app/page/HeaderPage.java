@@ -7,31 +7,71 @@ import java.util.NoSuchElementException;
 
 import up.mi.bdda.app.buffer.BufferManager;
 
+/**
+ * The HeaderPage class represents the header of a page in a file.
+ * It provides methods to set and get the identifiers of free and full pages.
+ * It also implements Iterable to allow iteration over the free pages.
+ */
 public class HeaderPage implements Iterable<PageId> {
-  private ByteBuffer buff;
 
-  public HeaderPage(ByteBuffer buff) {
-    this.buff = buff;
+  /**
+   * The buffer that holds the data of the header page.
+   */
+  private ByteBuffer buffer;
+
+  /**
+   * Constructs a HeaderPage object with the given buffer.
+   * 
+   * @param buffer the buffer that holds the data of the header page.
+   */
+  public HeaderPage(ByteBuffer buffer) {
+    this.buffer = buffer;
   }
 
+  /**
+   * Sets the identifier of the free page.
+   * 
+   * @param pageId the identifier of the free page.
+   */
   public void setFreePageId(PageId pageId) {
-    buff.putInt(0, pageId.getFileIdx());
-    buff.putInt(4, pageId.getPageIdx());
+    buffer.putInt(0, pageId.getFileIdx());
+    buffer.putInt(4, pageId.getPageIdx());
   }
 
+  /**
+   * Sets the identifier of the full page.
+   * 
+   * @param pageId the identifier of the full page.
+   */
   public void setFullPageId(PageId pageId) {
-    buff.putInt(8, pageId.getFileIdx());
-    buff.putInt(12, pageId.getPageIdx());
+    buffer.putInt(8, pageId.getFileIdx());
+    buffer.putInt(12, pageId.getPageIdx());
   }
 
+  /**
+   * Returns the identifier of the free page.
+   * 
+   * @return the identifier of the free page.
+   */
   public PageId getFreePageId() {
-    return new PageId(buff.getInt(0), buff.getInt(4));
+    return new PageId(buffer.getInt(0), buffer.getInt(4));
   }
 
+  /**
+   * Returns the identifier of the full page.
+   * 
+   * @return the identifier of the full page.
+   */
   public PageId getFullPageId() {
-    return new PageId(buff.getInt(8), buff.getInt(12));
+    return new PageId(buffer.getInt(8), buffer.getInt(12));
   }
 
+  /**
+   * Returns an iterator over the free pages.
+   * 
+   * @return an iterator over the free pages.
+   * @throws NoSuchElementException if there are no more free pages.
+   */
   @Override
   public Iterator<PageId> iterator() throws NoSuchElementException {
     // iterate over the free pages only
@@ -52,9 +92,9 @@ public class HeaderPage implements Iterable<PageId> {
         // get buffer for next iteration
         if (freePageId.isValid()) {
           try {
-            ByteBuffer nextFreePageBuf = BufferManager.getSingleton().getPage(pageId);
-            freePageId = new PageId(nextFreePageBuf.getInt(0), nextFreePageBuf.getInt(4));
-            BufferManager.getSingleton().freePage(pageId, false);
+            ByteBuffer nextFreePageBuffer = BufferManager.getInstance().getPageBuffer(pageId);
+            freePageId = new PageId(nextFreePageBuffer.getInt(0), nextFreePageBuffer.getInt(4));
+            BufferManager.getInstance().releasePage(pageId, false);
           } catch (IOException e) {
             e.printStackTrace();
           }

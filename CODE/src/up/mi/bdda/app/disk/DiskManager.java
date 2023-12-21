@@ -11,187 +11,172 @@ import java.util.Set;
 import up.mi.bdda.app.page.PageId;
 
 /**
- * The {@code DiskManager} class is a singleton class that manages the
- * allocation and deallocation of pages on disk. It also provides methods to
- * read and write data to these pages.
- * <p>
- * Here's a brief description of the methods in this class:
- * <ul>
- * <li>{@link #DiskManager()} - This is the default constructor that initializes
- * the fields.
- * <li>{@link #allocPage()} - This method allocates a new page on disk. If there
- * are deallocated pages, it reuses one of them. Otherwise, it creates a new
- * page.
- * <li>{@link #deallocPage(PageId)} - This method deallocates a page on disk. If
- * the page is in the set of allocated pages, it is removed from there and added
- * to the deque of deallocated pages.
- * <li>{@link #getAllocatedPageCount()} - This method returns the number of
- * allocated pages.
- * <li>{@link #readPage(PageId, ByteBuffer)} - This method reads data from a
- * page into a {@link ByteBuffer}.
- * <li>{@link #writePage(PageId, ByteBuffer)} - This method writes data from a
- * {@link ByteBuffer} to a page.
- * <li>{@link #getSingleton()} - This method returns the single instance of
- * {@code DiskManager}. If it doesn't exist, it creates it.
+ * DiskManager is a singleton class that manages the allocation and deallocation
+ * of pages on disk.
+ * It keeps track of active and reusable pages, and provides methods to read and
+ * write page data.
  */
 public final class DiskManager {
   /**
-   * A set of {@link PageId} objects that have been allocated.
+   * A set of PageIds that are currently active.
    */
-  private final Set<PageId> allocatedPageIds;
+  private final Set<PageId> activePageIds;
 
   /**
-   * A deque of {@link PageId} objects that have been deallocated and can be
-   * reused.
+   * A queue of PageIds that have been deallocated and can be reused.
    */
-  private final Deque<PageId> deallocatedPageIds;
+  private final Deque<PageId> reusablePageIds;
 
   /**
-   * The {@link PageId} of the current page being worked on.
+   * The PageId that is currently being worked on.
    */
-  private final PageId currentPageId;
+  private final PageId workingPageId;
 
   /**
-   * This is the default constructor that initializes the fields.
+   * Private constructor for the singleton DiskManager class.
    */
   private DiskManager() {
-    allocatedPageIds = new HashSet<>();
-    deallocatedPageIds = new ArrayDeque<>();
-    currentPageId = new PageId(0, 0);
-  }
-
-  public void init() throws IOException {
-    reset();
-  }
-
-  public void finish() throws IOException {
-    reset();
-  }
-
-  public void reset() throws IOException {
-    currentPageId.set(0, 0);
-    allocatedPageIds.clear();
-    deallocatedPageIds.clear();
+    activePageIds = new HashSet<>();
+    reusablePageIds = new ArrayDeque<>();
+    workingPageId = new PageId(0, 0);
   }
 
   /**
-   * This method allocates a new page on disk. If there are deallocated pages, it
-   * reuses one of them. Otherwise, it creates a new page.
-   * 
-   * @return the {@link PageId} of the allocated page
+   * Initializes the DiskManager by clearing all active and reusable pages.
    */
-  public PageId allocPage() throws IOException {
+  public void initialize() throws IOException {
+    clear();
+  }
+
+  /**
+   * Terminates the DiskManager by clearing all active and reusable pages.
+   */
+  public void terminate() throws IOException {
+    clear();
+  }
+
+  /**
+   * Clears all active and reusable pages and resets the working page index.
+   */
+  public void clear() throws IOException {
+    workingPageId.setIndexes(0, 0);
+    activePageIds.clear();
+    reusablePageIds.clear();
+  }
+
+  /**
+   * Allocates a new page on disk. If there are reusable pages, one of them is
+   * reused.
+   * Otherwise, a new page is created.
+   *
+   * @return The PageId of the allocated page.
+   */
+  public PageId allocatePage() throws IOException {
     PageId pageId;
 
-    if (deallocatedPageIds.isEmpty()) {
-      pageId = currentPageId.clone();
+    if (reusablePageIds.isEmpty()) {
+      pageId = workingPageId.clone();
       try {
         pageId.createFile();
       } catch (IOException e) {
         throw new IOException("Failed to allocate page", e);
       }
-      currentPageId.next();
+      workingPageId.nextIndex();
     } else {
-      pageId = deallocatedPageIds.poll();
+      pageId = reusablePageIds.poll();
     }
 
-    if (!allocatedPageIds.contains(pageId)) {
-      allocatedPageIds.add(pageId);
+    if (!activePageIds.contains(pageId)) {
+      activePageIds.add(pageId);
     }
     return pageId;
   }
 
   /**
-   * This method deallocates a page on disk. If the page is in the set of
-   * allocated pages, it is removed from there and added to the deque of
-   * deallocated pages.
-   * 
-   * @param pageId the {@link PageId} of the page to deallocate
+   * Deallocates a page, making it reusable.
+   *
+   * @param pageId The PageId of the page to deallocate.
    */
-  public void deallocPage(PageId pageId) {
+  public void deallocatePage(PageId pageId) {
     if (pageId == null) {
       throw new IllegalArgumentException("PageId cannot be null");
     }
 
-    if (allocatedPageIds.removeIf(p -> p.equals(pageId))) {
-      deallocatedPageIds.add(pageId);
+    if (activePageIds.removeIf(p -> p.equals(pageId))) {
+      reusablePageIds.add(pageId);
     }
 
-    if (allocatedPageIds.isEmpty()) {
-      currentPageId.set(0, 0);
+    if (activePageIds.isEmpty()) {
+      workingPageId.setIndexes(0, 0);
     }
   }
 
   /**
-   * This method returns the number of allocated pages.
-   * 
-   * @return the number of allocated pages
+   * Returns the number of currently active pages.
+   *
+   * @return The number of active pages.
    */
-  public int getAllocatedPageCount() {
-    return allocatedPageIds.size();
+  public int countActivePages() {
+    return activePageIds.size();
   }
 
   /**
-   * This method reads data from a page into a {@link ByteBuffer}.
-   * 
-   * @param pageId the {@link PageId} of the page to read
-   * @param buff   the {@link ByteBuffer} to read into
-   * @throws IOException if an I/O error occurs
+   * Loads the data of a page into a ByteBuffer.
+   *
+   * @param pageId The PageId of the page to load.
+   * @param buffer The ByteBuffer to load the data into.
    */
-  public void readPage(PageId pageId, ByteBuffer buff) throws IOException {
+  public void loadPageData(PageId pageId, ByteBuffer buffer) throws IOException {
     if (pageId == null) {
       throw new IllegalArgumentException("PageId cannot be null");
     }
 
-    if (buff == null) {
+    if (buffer == null) {
       throw new IllegalArgumentException("ByteBuffer cannot be null");
     }
 
     try (RandomAccessFile file = pageId.getAccessFile()) {
-      file.read(buff.array());
+      file.read(buffer.array());
     } catch (IOException e) {
       throw new RuntimeException("Error reading page", e);
     }
   }
 
   /**
-   * This method writes data from a {@link ByteBuffer} to a page.
-   * 
-   * @param pageId the {@link PageId} of the page to write
-   * @param buff   the {@link ByteBuffer} to write from
-   * @throws IOException if an I/O error occurs
+   * Saves the data of a ByteBuffer to a page.
+   *
+   * @param pageId The PageId of the page to save to.
+   * @param buffer The ByteBuffer containing the data to save.
    */
-  public void writePage(PageId pageId, ByteBuffer buff) throws IOException {
+  public void savePageData(PageId pageId, ByteBuffer buffer) throws IOException {
     if (pageId == null) {
       throw new IllegalArgumentException("PageId cannot be null");
     }
 
-    if (buff == null) {
+    if (buffer == null) {
       throw new IllegalArgumentException("ByteBuffer cannot be null");
     }
 
     try (RandomAccessFile file = pageId.getAccessFile()) {
-      file.write(buff.array());
+      file.write(buffer.array());
     } catch (IOException e) {
       throw new IOException("Error writing page", e);
     }
   }
 
   /**
-   * This method returns the unique instance of {@code DiskManager}. If it doesn't
-   * exist, it creates it.
-   * 
-   * @return the unique instance of {@code DiskManager}
+   * Returns the singleton instance of the DiskManager.
+   *
+   * @return The singleton DiskManager instance.
    */
-  public static DiskManager getSingleton() {
-    return Holder.INSTANCE;
+  public static DiskManager getInstance() {
+    return SingletonHolder.INSTANCE;
   }
 
-  private static class Holder {
-    /**
-     * The unique instance of {@code DiskManager}.
-     */
+  /**
+   * Private static class that holds the singleton DiskManager instance.
+   */
+  private static class SingletonHolder {
     private static final DiskManager INSTANCE = new DiskManager();
   }
-
 }

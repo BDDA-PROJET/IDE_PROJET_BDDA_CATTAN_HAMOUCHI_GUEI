@@ -5,108 +5,166 @@ import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
-import up.mi.bdda.app.DBParams;
 import up.mi.bdda.app.page.PageId;
+import up.mi.bdda.app.settings.DBParams;
 
+/**
+ * BufferManager is a class that manages the buffer memory of the application.
+ * It uses a LinkedHashMap to store MemoryFrame objects, which represent pages
+ * in memory.
+ * The class uses the Singleton design pattern to ensure only one instance of
+ * BufferManager exists.
+ */
 public final class BufferManager {
-  private final LinkedHashMap<PageId, Frame> cache;
+  /**
+   * A LinkedHashMap that maps PageId objects to MemoryFrame objects.
+   * The LinkedHashMap is used because it maintains the insertion order,
+   * which is useful for implementing the LRU (Least Recently Used) page
+   * replacement policy.
+   */
+  private final LinkedHashMap<PageId, MemoryFrame> memoryCache;
 
+  /**
+   * Private constructor to prevent instantiation of the class.
+   * Initializes the memoryCache with a maximum size specified by
+   * DBParams.maxFrameCount.
+   */
   private BufferManager() {
-    cache = new LinkedHashMap<>(DBParams.frameCount, 0.75f, true);
+    memoryCache = new LinkedHashMap<>(DBParams.maxFrameCount, 0.75f, true);
   }
 
-  public void init() {
-    reset();
+  /**
+   * Initializes the BufferManager by clearing the memoryCache.
+   */
+  public void initialize() {
+    clearMemory();
   }
 
-  public void finish() throws IOException {
-    flushAll();
+  /**
+   * Completes the operations of the BufferManager by flushing all pages.
+   * 
+   * @throws IOException if an I/O error occurs.
+   */
+  public void complete() throws IOException {
+    flushAllPages();
   }
 
-  public void reset() {
-    cache.clear();
+  /**
+   * Clears the memoryCache.
+   */
+  public void clearMemory() {
+    memoryCache.clear();
   }
 
-  private Frame peekFrame(PageId pageId) {
-    return cache.values().stream().parallel().filter(f -> f.getPageId().equals(pageId)).findAny().orElse(null);
+  /**
+   * Returns the MemoryFrame associated with the given PageId.
+   * 
+   * @param pageId the PageId of the MemoryFrame to return.
+   * @return the MemoryFrame associated with the given PageId, or null if no such
+   *         MemoryFrame exists.
+   */
+  private MemoryFrame getMemoryFrame(PageId pageId) {
+    return memoryCache.values().stream().parallel().filter(f -> f.getDataPageId().equals(pageId)).findAny()
+        .orElse(null);
   }
 
-  private Frame requestPage(PageId pageId) throws IOException {
-    Frame frame = cache.get(pageId);
-    if (frame == null) {
-      // Page not in memory, need to load it into a frame
-      if (cache.size() == DBParams.frameCount) {
-        // No available frames, need to evict the least recently used one
-        Iterator<PageId> iterator = cache.keySet().iterator();
+  /**
+   * Loads the page with the given PageId into memory.
+   * If the memoryCache is full, it uses the LRU policy to replace a page.
+   * 
+   * @param pageId the PageId of the page to load.
+   * @return the MemoryFrame of the loaded page.
+   * @throws IOException if an I/O error occurs.
+   */
+  private MemoryFrame loadPage(PageId pageId) throws IOException {
+    MemoryFrame memoryFrame = memoryCache.get(pageId);
+    if (memoryFrame == null) {
+      if (memoryCache.size() == DBParams.maxFrameCount) {
+        Iterator<PageId> iterator = memoryCache.keySet().iterator();
         while (iterator.hasNext()) {
           PageId lruPageId = iterator.next();
-          frame = peekFrame(lruPageId);
-          if (frame.getPinCount() == 0) {
+          memoryFrame = getMemoryFrame(lruPageId);
+          if (memoryFrame.getUsageCount() == 0) {
             break;
           }
         }
-        // Write the frame to disk if it's dirty
-        frame.free();
-
-        // Remove the page from the cache
-        cache.remove(frame.getPageId());
+        memoryFrame.releaseDataBlock();
+        memoryCache.remove(memoryFrame.getDataPageId());
       } else {
-        // There's an available frame, use it
-        frame = new Frame();
+        memoryFrame = new MemoryFrame();
       }
-      // Load the page into the frame
-      frame.loadPage(pageId);
-      // Add the page to the cache
-      cache.put(pageId, frame);
+      memoryFrame.loadDataPage(pageId);
+      memoryCache.put(pageId, memoryFrame);
     }
-    // Increment the pin count
-    frame.incrementPinCount();
-    return frame;
+    memoryFrame.increaseUsageCount();
+    return memoryFrame;
   }
 
-  public ByteBuffer getPage(PageId pageId) throws IOException {
-    Frame frame = requestPage(pageId);
+  /**
+   * Returns the ByteBuffer of the page with the given PageId.
+   * 
+   * @param pageId the PageId of the page.
+   * @return the ByteBuffer of the page.
+   * @throws IOException if an I/O error occurs.
+   */
+  public ByteBuffer getPageBuffer(PageId pageId) throws IOException {
+    MemoryFrame memoryFrame = loadPage(pageId);
 
-    return frame.getBuff();
+    return memoryFrame.getDataBuffer();
   }
 
-  public synchronized void freePage(PageId pageId, boolean dirty) throws IOException {
-    // Get the frame containing the page
-    // Frame frame = peekFrame(pageId);
-    Frame frame = cache.get(pageId);
+  /**
+   * Releases the page with the given PageId.
+   * If the page was modified, it is marked as such and its data block is
+   * released.
+   * 
+   * @param pageId     the PageId of the page to release.
+   * @param isModified whether the page was modified.
+   * @throws IOException if an I/O error occurs.
+   */
+  public void releasePage(PageId pageId, boolean isModified) throws IOException {
+    MemoryFrame memoryFrame = memoryCache.get(pageId);
 
-    if (frame != null) {
-      // The page is in the cache
-      // Decrement the pin count
-      frame.decrementPinCount();
-      if (dirty) {
-        // Mark the frame as dirty
-        frame.setDirty();
-        // Write the frame to disk if it's dirty
-        frame.free();
+    if (memoryFrame != null) {
+      memoryFrame.decreaseUsageCount();
+      if (isModified) {
+        memoryFrame.markAsModified();
+        memoryFrame.releaseDataBlock();
       }
     } else {
       throw new IllegalStateException("Cannot unpin a page that does not exist in buffer");
     }
   }
 
-  public void flushAll() throws IOException {
-    if (cache.size() > 0) {
-      for (Frame frame : cache.values()) {
-        // Flush the frame to disk
-        frame.free();
-        frame.reset();
+  /**
+   * Flushes all pages in the memoryCache.
+   * 
+   * @throws IOException if an I/O error occurs.
+   */
+  public void flushAllPages() throws IOException {
+    if (memoryCache.size() > 0) {
+      for (MemoryFrame memoryFrame : memoryCache.values()) {
+        memoryFrame.releaseDataBlock();
+        memoryFrame.resetDataBlock();
       }
-      // Clear the cache
-      cache.clear();
+      memoryCache.clear();
     }
   }
 
-  public static BufferManager getSingleton() {
-    return Holder.INSTANCE;
+  /**
+   * Returns the single instance of BufferManager.
+   * 
+   * @return the single instance of BufferManager.
+   */
+  public static BufferManager getInstance() {
+    return SingletonHolder.INSTANCE;
   }
 
-  private final class Holder {
+  /**
+   * SingletonHolder is a private static class that holds the single instance of
+   * BufferManager.
+   */
+  private final class SingletonHolder {
     private static final BufferManager INSTANCE = new BufferManager();
   }
 }

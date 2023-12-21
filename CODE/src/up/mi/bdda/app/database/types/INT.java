@@ -1,6 +1,11 @@
 package up.mi.bdda.app.database.types;
 
-public class INT implements Type {
+/**
+ * INT class represents the integer data type in the database.
+ * It implements the DataType interface.
+ */
+public class INT implements DataType {
+
   @Override
   public String name() {
     return "INT";
@@ -19,5 +24,15 @@ public class INT implements Type {
   @Override
   public Object parse(String value) {
     return Integer.parseInt(value);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof INT;
+  }
+
+  @Override
+  public String toString() {
+    return "INT";
   }
 }
