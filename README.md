@@ -1,103 +1,64 @@
-# SGBD
+# Database Project
 
-## Getting started
+This project is a simple database management system implemented in Java. It provides basic functionality for interacting with a database, including operations like loading queries from a file and executing them.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## Structure
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+The project is structured into several packages, each responsible for a different aspect of the database system:
 
-## Add your files
+-   `app`: Contains the main entry point of the application in the [`QueryManager.java`](CODE/src/up/mi/bdda/app/QueryManager.java) file.
+-   `database`: Contains classes for managing the database, including [`DBManager.java`](CODE/src/up/mi/bdda/app/database/DBManager.java) and [`DatabaseInfo.java`](CODE/src/up/mi/bdda/app/database/DatabaseInfo.java), and various classes in the api, operations, and query subpackages.
+-   `file`: Contains the [`DBFileManager.java`](CODE/src/up/mi/bdda/app/file/DBFileManager.java) class for managing file operations.
+-   `page`: Contains classes for managing pages, such as [`PageId.java`](CODE/src/up/mi/bdda/app/page/PageId.java), [`HeaderPage.java`](CODE/src/up/mi/bdda/app/page/HeaderPage.java), and [`DataPage.java`](CODE/src/up/mi/bdda/app/page/DataPage.java).
+-   `disk`: Contains the [`DiskManager.java`](CODE/src/up/mi/bdda/app/disk/DiskManager.java) class for managing disk operations.
+-   `buffer`: Contains classes for managing memory frames and buffers, including [`BufferManager.java`](CODE/src/up/mi/bdda/app/buffer/BufferManager.java) and [`MemoryFrame.java`](CODE/src/up/mi/bdda/app/buffer/MemoryFrame.java).
+-   `settings`: Contains classes for managing database settings, including [`DBParams.java`](CODE/src/up/mi/bdda/app/DBParams.java).
+-   `utils`: Contains utility classes for the project.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+## How to Run
 
+The entry point of the project is the `main` method in the [`QueryManager.java`](CODE/src/up/mi/bdda/app/QueryManager.java) class. This method sets up the database parameters, loads queries from a file if provided, and enters a loop to accept and process user queries.
+
+To run the project, you can use the following command:
+
+1. Compile all the Java files in the `src` directory.
+
+```sh
+javac -d CODE/bin CODE/src/**/*.java
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/projet_bdda_cattan_hamouchi_guei/SGBD.git
-git branch -M main
-git push -uf origin main
+
+2. Run the [`DBParams.java`](CODE/src/up/mi/bdda/app/DBParams.java) class, which is the main entry point of the application.
+
+```sh
+java -cp CODE/bin app.mi.bdda.app.DBParams
 ```
 
-## Integrate with your tools
+You can optionally pass a file path as a command-line argument to [`DBParams.java`](CODE/src/up/mi/bdda/app/DBParams.java). This file should contain queries to be executed.
 
-- [ ] [Set up project integrations](https://gitlab.com/projet_bdda_cattan_hamouchi_guei/SGBD/-/settings/integrations)
+Please note that the database folder path, page size, and maximum file and frame counts are currently hardcoded in the [`DBParams.java`](CODE/src/up/mi/bdda/app/DBParams.java) class. You may need to adjust these values according to your system configuration.
 
-## Collaborate with your team
+# Available Operations
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+Based on the standard operations that are typically available in a database management system, here are some operations that might be available:
 
-## Test and Deploy
+-   **Reset**: This operation allows you to rest the database. This can be done using a `RESETDB` statement.
+-   **Create**: This operation allows you to create a new database or a new table in the database. This can be done using a `CREATE` statement.
+-   **Read**: This operation allows you to read data from the database. This can be done using a `SELECT` statement.
+-   **Delete**: This operation allows you to delete data from the database. This can be done using a `DELETE` statement.
+-   **Insert**: This operation allows you to insert new data into the database. This can be done using an `INSERT` statement.
 
-Use the built-in continuous integration in GitLab.
+## Testing
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+The project includes a `tests` package with unit tests for various components of the system. To run the tests, use the following command:
 
----
+```sh
+java -jar lib/junit-platform-console-standalone-1.9.3.jar --class-path bin --scan-class-path
+```
 
-# Editing this README
+Please note that you need to compile the project before running the tests.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## Authors
 
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-
-Choose a self-explaining name for your project.
-
-## Description
-
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-
-Show your appreciation to those who have contributed to the project.
-
-## License
-
-For open source projects, say how it is licensed.
-
-## Project status
-
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+-   **Assahe Guei** - _Initial work_ - [gugeorgy](https://github.com/gugeorgy)
+-   **HAMOUCHI Nabile** - _Initial work_ - [Pepitozlp](https://github.com/Pepitozlp)
+-   **CATTAN Emmanuel** - _Initial work_ - [nvbile](https://github.com/nvbile)

@@ -1,6 +1,1 @@
-.env
-*.py
-*.yaml
 /CODE/bin/
-docs/
-commitLintTrick.txt
