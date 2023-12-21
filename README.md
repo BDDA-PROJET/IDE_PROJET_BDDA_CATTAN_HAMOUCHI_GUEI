@@ -27,15 +27,15 @@ To run the project, you can use the following command:
 javac -d CODE/bin CODE/src/**/*.java
 ```
 
-2. Run the [`DBParams.java`](CODE/src/up/mi/bdda/app/DBParams.java) class, which is the main entry point of the application.
+2. Run the [`QueryManager.java`](CODE/src/up/mi/bdda/app/QueryManager.java) class, which is the main entry point of the application.
 
 ```sh
-java -cp CODE/bin app.mi.bdda.app.DBParams
+java -cp CODE/bin app.mi.bdda.app.QueryManager
 ```
 
-You can optionally pass a file path as a command-line argument to [`DBParams.java`](CODE/src/up/mi/bdda/app/DBParams.java). This file should contain queries to be executed.
+You can optionally pass a file path as a command-line argument to [`QueryManager.java`](CODE/src/up/mi/bdda/app/QueryManager.java). This file should contain queries to be executed.
 
-Please note that the database folder path, page size, and maximum file and frame counts are currently hardcoded in the [`DBParams.java`](CODE/src/up/mi/bdda/app/DBParams.java) class. You may need to adjust these values according to your system configuration.
+Please note that the database folder path, page size, and maximum file and frame counts are currently hardcoded in the [`DBParams.java`](CODE/src/up/mi/bdda/app/settings/DBParams.java) class. You may need to adjust these values according to your system configuration.
 
 # Available Operations
 
