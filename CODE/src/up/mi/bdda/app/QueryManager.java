@@ -120,7 +120,9 @@ public class QueryManager {
       return;
     }
 
-    DBParams.displayRecordsValues = args.length > 1 && args[1].equals("true");
+    if (args.length > 1) {
+      DBParams.displayRecordsValues = args[1].equals("false") ? false : true;
+    }
 
     DBManager dbManager = DBManager.getInstance();
     dbManager.startInitialization();

@@ -12,7 +12,7 @@ The project is structured into several packages, each responsible for a differen
 -   `page`: Contains classes for managing pages, such as [`PageId.java`](CODE/src/up/mi/bdda/app/page/PageId.java), [`HeaderPage.java`](CODE/src/up/mi/bdda/app/page/HeaderPage.java), and [`DataPage.java`](CODE/src/up/mi/bdda/app/page/DataPage.java).
 -   `disk`: Contains the [`DiskManager.java`](CODE/src/up/mi/bdda/app/disk/DiskManager.java) class for managing disk operations.
 -   `buffer`: Contains classes for managing memory frames and buffers, including [`BufferManager.java`](CODE/src/up/mi/bdda/app/buffer/BufferManager.java) and [`MemoryFrame.java`](CODE/src/up/mi/bdda/app/buffer/MemoryFrame.java).
--   `settings`: Contains classes for managing database settings, including [`DBParams.java`](CODE/src/up/mi/bdda/app/DBParams.java).
+-   `settings`: Contains classes for managing database settings, including [`DBParams.java`](CODE/src/up/mi/bdda/app/settings/DBParams.java).
 -   `utils`: Contains utility classes for the project.
 
 ## How to Run
