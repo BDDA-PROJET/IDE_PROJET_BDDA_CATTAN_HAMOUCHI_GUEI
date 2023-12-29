@@ -60,5 +60,5 @@ Based on the standard operations that are typically available in a database mana
 ## Authors
 
 -   **Assahe Guei** - _Initial work_ - [gugeorgy](https://github.com/gugeorgy)
--   **HAMOUCHI Nabile** - _Initial work_ - [Pepitozlp](https://github.com/Pepitozlp)
--   **CATTAN Emmanuel** - _Initial work_ - [nvbile](https://github.com/nvbile)
+-   **HAMOUCHI Nabile** - _Initial work_ - [nvbile](https://github.com/nvbile)
+-   **CATTAN Emmanuel** - _Initial work_ - [Pepitozlp](https://github.com/Pepitozlp)
