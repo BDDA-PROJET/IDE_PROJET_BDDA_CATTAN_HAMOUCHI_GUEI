@@ -1,4 +1,6 @@
 /CODE/bin/
+/DB/
 *.csv
 *.txt
 .git
+.vscode
