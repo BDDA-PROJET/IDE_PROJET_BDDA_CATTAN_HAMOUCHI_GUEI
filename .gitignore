@@ -1,3 +1,4 @@
 /CODE/bin/
 *.csv
 *.txt
+.git
