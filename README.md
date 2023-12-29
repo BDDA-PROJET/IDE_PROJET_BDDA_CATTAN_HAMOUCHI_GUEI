@@ -54,7 +54,6 @@ Based on the standard operations that are typically available in a database mana
 -   **Select**: This operation allows you to read data from the database. This can be done using a `SELECT` statement.
 -   **Delete**: This operation allows you to delete data from the database. This can be done using a `DELETE` statement.
 -   **Insert**: This operation allows you to insert new data into the database. This can be done using an `INSERT` statement.
--   **Insert**: This operation allows you to insert new data into the database. This can be done using an `INSERT` statement.
 -   **Import**: This operation allows you to import data from an external file into the database. This can be done using an `IMPORT` statement followed by the file path.
 -   **Exit**: This operation allows you to end the current process. This can be done using an `EXIT` statement.
 
