@@ -66,19 +66,6 @@ public class SlotDirectory {
   }
 
   /**
-   * Clears the slot directory in the given buffer.
-   * 
-   * @param buffer The ByteBuffer to clear.
-   */
-  public void clear(ByteBuffer buffer) {
-    int size = 8 + getRecordStartPositionSize();
-    buffer.position(buffer.capacity() - size);
-    for (int i = 0; i < getRecordStartPositionSize(); i++) {
-      buffer.put((byte) 0);
-    }
-  }
-
-  /**
    * Reads the slot directory from disk.
    * 
    * @param buffer The ByteBuffer to read from.
@@ -97,60 +84,85 @@ public class SlotDirectory {
     }
   }
 
-  // Getters
+  /**
+   * Returns the index of the free space in the page.
+   */
   public int getFreeSpaceIndex() {
     return freeSpaceIndex;
   }
 
+  /**
+   * Returns the number of entries in the directory.
+   */
   public int getEntryCount() {
     return entryCount;
   }
 
+  /**
+   * Returns the start position and size of the record at the given index.
+   * 
+   * @param slotIdx The index of the record.
+   */
   public int[] getRecordStartPosition(int slotIdx) {
     return recordStartPositions.get(slotIdx);
   }
 
+  /**
+   * Removes the start position and size of the record at the given index.
+   * 
+   * @param slotIdx The index of the record.
+   */
   public int[] removeRecordStartPosition(int slotIdx) {
-    int[] recordStartPosition = recordStartPositions.remove(slotIdx);
-    entryCount -= 2;
-    return recordStartPosition;
+    int[] recordStartPosition = recordStartPositions.get(slotIdx);
+    int start = recordStartPosition[0];
+    int size = recordStartPosition[1];
+    recordStartPosition[0] = 0;
+    recordStartPosition[1] = 0;
+    return new int[] { start, size };
   }
 
+  /**
+   * Returns the total size of the directory in bytes.
+   */
   public int getDirectorySize() {
     return 8 + getRecordStartPositionSize();
   }
 
-  // Setters
+  /**
+   * Sets the index of the free space in the page.
+   * 
+   * @param offset The new free space index.
+   */
   public void setFreeSpaceIndex(int offset) {
     freeSpaceIndex = offset;
   }
 
+  /**
+   * Sets the number of entries in the directory.
+   * 
+   * @param i The new number of entries.
+   */
   public void setEntryCount(int i) {
     entryCount = i;
   }
 
+  /**
+   * Sets the start positions of the records.
+   * 
+   * @param recordStartPositions The new list of record start positions.
+   */
   public void setRecordStartPosition(Collection<int[]> recordStartPositions) {
     this.recordStartPositions = new ArrayList<>(recordStartPositions);
   }
 
+  /**
+   * Adds a new record start position and size.
+   * 
+   * @param start The start position of the new record.
+   * @param size  The size of the new record.
+   */
   public void addRecordStartPosition(int start, int size) {
     recordStartPositions.add(new int[] { start, size });
   }
 
-  @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("SlotDirectory [freeSpaceIndex=").append(freeSpaceIndex)
-        .append(", entryCount=").append(entryCount)
-        .append(", recordStartPositions=[");
-    for (int i = 0; i < recordStartPositions.size(); i++) {
-      sb.append("[start=").append(recordStartPositions.get(i)[0]).append(", size=")
-          .append(recordStartPositions.get(i)[1]).append("]");
-      if (i < recordStartPositions.size() - 1) {
-        sb.append(", ");
-      }
-    }
-    sb.append("]]");
-    return sb.toString();
-  }
 }

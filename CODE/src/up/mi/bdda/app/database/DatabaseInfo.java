@@ -20,9 +20,9 @@ import up.mi.bdda.app.settings.DBParams;
 public final class DatabaseInfo {
 
   /**
-   * The path to the file where the database information is stored.
+   * The file where the database information is stored.
    */
-  private final String DB_INFO_FILE = String.format("%s/DBInfo.save", DBParams.databaseFolderPath);
+  private final File DB_FILE = new File(String.format("%s/DBInfo.save", DBParams.databaseFolderPath));
 
   /**
    * A map that stores the details of each table in the database.
@@ -46,9 +46,8 @@ public final class DatabaseInfo {
    */
   @SuppressWarnings("unchecked")
   public void initialize() throws IOException {
-    File dbFile = new File(DB_INFO_FILE);
-    if (dbFile.exists()) {
-      try (FileInputStream fileIn = new FileInputStream(DB_INFO_FILE);
+    if (DB_FILE.exists()) {
+      try (FileInputStream fileIn = new FileInputStream(DB_FILE);
           ObjectInputStream in = new ObjectInputStream(fileIn)) {
         tableDetailsMap = (Map<String, TableInfo>) in.readObject();
       } catch (IOException | ClassNotFoundException e) {
@@ -64,9 +63,8 @@ public final class DatabaseInfo {
    */
   public void clearData() throws IOException {
     tableDetailsMap.clear();
-    File dbFile = new File(DB_INFO_FILE);
-    if (dbFile.exists()) {
-      if (!dbFile.delete()) {
+    if (DB_FILE.exists()) {
+      if (!DB_FILE.delete()) {
         throw new IOException("Error while deleting the database info");
       }
     }
@@ -78,7 +76,11 @@ public final class DatabaseInfo {
    * @throws IOException if there is an error while saving the database info.
    */
   public void saveData() throws IOException {
-    try (FileOutputStream fileOut = new FileOutputStream(DB_INFO_FILE);
+
+    if (!DB_FILE.exists()) {
+      DB_FILE.getParentFile().mkdir();
+    }
+    try (FileOutputStream fileOut = new FileOutputStream(DB_FILE);
         ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
       out.writeObject(tableDetailsMap);
     } catch (Exception e) {

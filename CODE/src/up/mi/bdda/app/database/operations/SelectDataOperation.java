@@ -112,12 +112,7 @@ public class SelectDataOperation implements DatabaseOperation {
   private void displayRecords(Collection<Record> records) {
     System.out.println();
 
-    if (records.isEmpty()) {
-      System.out.println("No records found!");
-      return;
-    }
-
-    if (DBParams.displayRecordsValues) {
+    if (!records.isEmpty() && DBParams.displayRecordsValues) {
       for (Record record : records) {
         System.out.println(record);
       }

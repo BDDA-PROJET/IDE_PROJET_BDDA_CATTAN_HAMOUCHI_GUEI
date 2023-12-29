@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import up.mi.bdda.app.database.DBManager;
@@ -39,20 +40,39 @@ public class QueryManager {
 
     List<String> storedQueries = new ArrayList<>();
 
-    if (args.length > 0) {
-      loadQueriesFromFile(storedQueries, args[0]);
-      DBParams.displayRecordsValues = args.length > 1 && args[1].equals("true");
-    } else {
-      System.out.println("No file found! It doesn't matter ... : )");
-    }
     System.out.println("!! Welcome to the DBMS !!");
 
+    if (args.length > 0) {
+      try {
+        loadQueriesFromFile(storedQueries, args[0]);
+        List<String> availableOperations = List.of("RESETDB", "CREATE", "IMPORT", "INSERT", "SELECT", "DELETE", "EXIT");
+        Iterator<String> storedQueriesIterator = storedQueries.iterator();
+        while (storedQueriesIterator.hasNext()) {
+          String query = storedQueriesIterator.next();
+          if (!availableOperations.contains(query.split(" ")[0])) {
+            storedQueriesIterator.remove();
+          }
+        }
+        System.out.println(String.format(":: (Info) Loaded %d %s from file: %s", storedQueries.size(),
+            storedQueries.size() > 1 ? "queries" : "query", args[0]));
+      } catch (IOException e) {
+        System.out.println(String.format(":: (Error) Could not load queries from file: %s", args[0]));
+      }
+
+    } else {
+      System.out.println(":: (Info) No file provided for loading queries, starting with an empty list of queries.");
+    }
+
     BufferedReader userInputReader = new BufferedReader(new InputStreamReader(System.in));
-    System.out.println(":: Please enter all your queries here");
+    System.out.println(
+        ":: (Info) You can not execute queries one by one, you must enter them all and execute them at once.");
+    System.out.println(
+        ":: (Info) Please note that only lines that follow the available operations (RESETDB, CREATE, INSERT, IMPORT, SELECT, EXIT) will be executed.");
+    System.out.println("\n:: Please enter all your queries below :");
     while (true) {
-      System.out.println(":: Enter `LIST` to see all your queries");
-      System.out.println(":: Enter `ADD <query>` to add a query");
-      System.out.print(":: Enter `START` to execute all your queries at once\n-> ");
+      System.out.println(":: Enter `LIST` to see all queries.");
+      System.out.println(":: Enter `ADD <query>` to add a query.");
+      System.out.print(":: Enter `START` to execute all queries at once.\n-> ");
       String userQuery = userInputReader.readLine();
       if (userQuery.equals("START")) {
         break;
@@ -61,7 +81,7 @@ public class QueryManager {
       switch (parsedQueries[0]) {
         case "LIST":
           System.out.println("===");
-          System.out.println("Here are the list of queries:");
+          System.out.println(":: Here is the list of queries:");
           System.out.println("===");
           if (storedQueries.size() == 0) {
             System.out.println("No queries found!");
@@ -74,22 +94,33 @@ public class QueryManager {
           break;
         case "ADD":
           storedQueries.add(parsedQueries[1]);
+          System.out.println("Query added!");
           break;
         default:
-          System.out.println("Unknown command!");
+          System.out.println(":: (Error) Unknown command!");
           break;
       }
     }
     userInputReader.close();
 
     if (args.length > 0) {
-      saveQueriesToFile(storedQueries, args[0]);
+      try {
+        saveQueriesToFile(storedQueries, args[0]);
+        System.out.println(String.format(":: (Info) Saved %d %s to file: %s", storedQueries.size(),
+            storedQueries.size() > 1 ? "queries" : "query", args[0]));
+      } catch (IOException e) {
+        System.out.println(String.format(":: (Error) Could not save queries to file: %s", args[0]));
+      }
     }
 
     if (storedQueries.size() == 0) {
       System.out.println("No queries found!, exiting ...");
+      System.out.println("\n:: Thank you for using the DBMS!");
+
       return;
     }
+
+    DBParams.displayRecordsValues = args.length > 1 && args[1].equals("true");
 
     DBManager dbManager = DBManager.getInstance();
     dbManager.startInitialization();
@@ -121,7 +152,7 @@ public class QueryManager {
         queries.add(line);
       }
     } catch (IOException e) {
-      throw new IOException("Error reading file", e);
+      throw new IOException("Error reading file: " + filename);
     }
   }
 
@@ -139,7 +170,7 @@ public class QueryManager {
         fileWriter.newLine();
       }
     } catch (IOException e) {
-      throw new IOException("Error writing to file", e);
+      throw new IOException("Error writing to file: " + filename);
     }
   }
 

@@ -17,7 +17,7 @@ The project is structured into several packages, each responsible for a differen
 
 ## How to Run
 
-The entry point of the project is the `main` method in the [`QueryManager.java`](CODE/src/up/mi/bdda/app/QueryManager.java) class. This method sets up the database parameters, loads queries from a file if provided, and enters a loop to accept and process user queries.
+The entry point of the project is the `main` method in the [`QueryManager.java`](CODE/src/up/mi/bdda/app/QueryManager.java) class. This method sets up the database parameters, loads queries from a file if provided, and enters a loop to accept and process user queries. Please note that only lines that follow the available operations below will be executed.
 
 This project uses a shell script to compile and run Java files. The script navigates to the `src` directory, compiles all Java files it finds there and its subdirectories, and then runs the main class.
 
@@ -51,9 +51,12 @@ Based on the standard operations that are typically available in a database mana
 
 -   **Reset**: This operation allows you to rest the database. This can be done using a `RESETDB` statement.
 -   **Create**: This operation allows you to create a new database or a new table in the database. This can be done using a `CREATE` statement.
--   **Read**: This operation allows you to read data from the database. This can be done using a `SELECT` statement.
+-   **Select**: This operation allows you to read data from the database. This can be done using a `SELECT` statement.
 -   **Delete**: This operation allows you to delete data from the database. This can be done using a `DELETE` statement.
 -   **Insert**: This operation allows you to insert new data into the database. This can be done using an `INSERT` statement.
+-   **Insert**: This operation allows you to insert new data into the database. This can be done using an `INSERT` statement.
+    **Import**: This operation allows you to import data from an external file into the database. This can be done using an `IMPORT` statement followed by the file path.
+-   **Exit**: This operation allows you to end the current process. This can be done using an `EXIT` statement.
 
 ## Authors
 
