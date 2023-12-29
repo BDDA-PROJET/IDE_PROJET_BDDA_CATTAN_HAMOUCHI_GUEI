@@ -9,10 +9,5 @@ find . -name "*.java" -print | xargs javac -d ../bin
 # Navigate back to the project root directory
 cd ../..
 
-# Check if the file exists
-if [ -f "$1" ]; then
-    # Run the main class with the first command-line argument
-    java -cp ./CODE/bin up.mi.bdda.app.QueryManager $1 $2
-else
-    echo "File not found: $1"
-fi
+# Run the main class with the first command-line argument
+java -cp ./CODE/bin up.mi.bdda.app.QueryManager $1 $2
