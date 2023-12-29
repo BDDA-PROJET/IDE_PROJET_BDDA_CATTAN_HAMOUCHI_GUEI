@@ -12,6 +12,7 @@ import up.mi.bdda.app.database.resource.TableInfo;
 import up.mi.bdda.app.database.types.DataType;
 import up.mi.bdda.app.database.resource.Record;
 import up.mi.bdda.app.file.DBFileManager;
+import up.mi.bdda.app.settings.DBParams;
 
 /**
  * This class represents a select operation on a database.
@@ -45,7 +46,7 @@ public class SelectDataOperation implements DatabaseOperation {
     resourceName = query.get("RESOURCE");
     if (query.containsKey("WHERE")) {
       String[] conditions = query.get("WHERE").split(" AND ");
-      String[] operators = { "=", "<>", "<=", ">=", "<", ">" };
+      String[] operators = { "<>", "<=", ">=", "<", ">", "=" };
       for (String condition : conditions) {
         for (String operator : operators) {
           if (condition.contains(operator)) {
@@ -65,6 +66,7 @@ public class SelectDataOperation implements DatabaseOperation {
    * @param operator The operator of the condition.
    * @param value    The value to compare the field with.
    */
+  @SuppressWarnings("unchecked")
   private void processWhereCondition(String field, String operator, String value) {
     TableInfo resource = DBManager.getInstance().getDBInfo().getTableDetails(resourceName);
     DataType type = resource.scheme().getField(field).type;
@@ -80,16 +82,16 @@ public class SelectDataOperation implements DatabaseOperation {
         });
         break;
       case "<":
-        conditions.add(record -> ((Comparable) record.getDataElement(field)).compareTo(parsedValue) < 0);
+        conditions.add(record -> ((Comparable<Object>) record.getDataElement(field)).compareTo(parsedValue) < 0);
         break;
       case ">":
-        conditions.add(record -> ((Comparable) record.getDataElement(field)).compareTo(parsedValue) > 0);
+        conditions.add(record -> ((Comparable<Object>) record.getDataElement(field)).compareTo(parsedValue) > 0);
         break;
       case "<=":
-        conditions.add(record -> ((Comparable) record.getDataElement(field)).compareTo(parsedValue) <= 0);
+        conditions.add(record -> ((Comparable<Object>) record.getDataElement(field)).compareTo(parsedValue) <= 0);
         break;
       case ">=":
-        conditions.add(record -> ((Comparable) record.getDataElement(field)).compareTo(parsedValue) >= 0);
+        conditions.add(record -> ((Comparable<Object>) record.getDataElement(field)).compareTo(parsedValue) >= 0);
         break;
       case "<>":
         conditions.add(record -> {
@@ -108,15 +110,20 @@ public class SelectDataOperation implements DatabaseOperation {
    * @param records The records to display.
    */
   private void displayRecords(Collection<Record> records) {
+    System.out.println();
+
     if (records.isEmpty()) {
-      System.out.println("No records found");
+      System.out.println("No records found!");
       return;
     }
 
-    for (Record record : records) {
-      System.out.println(record);
+    if (DBParams.displayRecordsValues) {
+      for (Record record : records) {
+        System.out.println(record);
+      }
     }
-    System.out.println(String.format("Total records: %d", records.size()));
+
+    System.out.println(String.format("Total record(s): %d", records.size()));
   }
 
   /**

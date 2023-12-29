@@ -60,6 +60,9 @@ public class AddDataOperation implements DatabaseOperation {
 
     Record newRecord = Record.of(tableInfo.scheme(), recordValues);
     DBFileManager.getInstance().addRecordToTable(newRecord);
+
+    // Print a message to the user
+    System.out.println(" ... done!");
   }
 
 }

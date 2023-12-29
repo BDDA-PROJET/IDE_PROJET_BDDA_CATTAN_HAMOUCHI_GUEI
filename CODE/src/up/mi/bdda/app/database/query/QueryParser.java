@@ -85,6 +85,10 @@ public class QueryParser {
       queries.put("FILE", file);
     }
 
+    if (queries.size() == 0) {
+      return null;
+    }
+
     return new SimpleQuery(queries);
   }
 }

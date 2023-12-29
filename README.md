@@ -19,21 +19,29 @@ The project is structured into several packages, each responsible for a differen
 
 The entry point of the project is the `main` method in the [`QueryManager.java`](CODE/src/up/mi/bdda/app/QueryManager.java) class. This method sets up the database parameters, loads queries from a file if provided, and enters a loop to accept and process user queries.
 
-To run the project, you can use the following command:
+This project uses a shell script to compile and run Java files. The script navigates to the `src` directory, compiles all Java files it finds there and its subdirectories, and then runs the main class.
 
-1. Compile all the Java files in the `src` directory.
+To run the script, follow these steps:
 
-```sh
-javac -d CODE/bin CODE/src/**/*.java
-```
-
-2. Run the [`QueryManager.java`](CODE/src/up/mi/bdda/app/QueryManager.java) class, which is the main entry point of the application.
+1. Open your terminal.
+2. Navigate to the project root directory.
+3. Make the script executable by running
 
 ```sh
-java -cp CODE/bin app.mi.bdda.app.QueryManager
+chmod +x run.sh
 ```
+
+4. Run the script with
+
+```sh
+./run.sh <query_file_path> <display_records>
+```
+
+The script will compile all the Java files in the `src` directory and its subdirectories, and then run the `QueryManager` class from the `bin` directory.
 
 You can optionally pass a file path as a command-line argument to [`QueryManager.java`](CODE/src/up/mi/bdda/app/QueryManager.java). This file should contain queries to be executed.
+
+The second command-line argument, `<display_records>`, is a boolean value that determines whether the records should be displayed in the terminal or not. If you want to display the records, pass `true` as the second argument. If you don't want to display the records, pass `false`.
 
 Please note that the database folder path, page size, and maximum file and frame counts are currently hardcoded in the [`DBParams.java`](CODE/src/up/mi/bdda/app/settings/DBParams.java) class. You may need to adjust these values according to your system configuration.
 
@@ -46,16 +54,6 @@ Based on the standard operations that are typically available in a database mana
 -   **Read**: This operation allows you to read data from the database. This can be done using a `SELECT` statement.
 -   **Delete**: This operation allows you to delete data from the database. This can be done using a `DELETE` statement.
 -   **Insert**: This operation allows you to insert new data into the database. This can be done using an `INSERT` statement.
-
-## Testing
-
-The project includes a `tests` package with unit tests for various components of the system. To run the tests, use the following command:
-
-```sh
-java -jar lib/junit-platform-console-standalone-1.9.3.jar --class-path bin --scan-class-path
-```
-
-Please note that you need to compile the project before running the tests.
 
 ## Authors
 

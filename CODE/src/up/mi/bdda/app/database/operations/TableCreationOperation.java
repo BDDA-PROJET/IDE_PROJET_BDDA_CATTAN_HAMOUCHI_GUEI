@@ -78,6 +78,9 @@ public class TableCreationOperation implements DatabaseOperation {
     resource = new TableInfo(resourceName, fileManager.generateHeaderPage());
     Scheme.of(resource, fields.toArray(FieldInfo[]::new));
     DBManager.getInstance().getDBInfo().addResourceDetails(resource);
+
+    // Print a message to the user
+    System.out.println(" ... done!");
   }
 
 }

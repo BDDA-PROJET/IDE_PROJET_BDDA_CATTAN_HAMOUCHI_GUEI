@@ -71,4 +71,8 @@ public class TableInfo implements Serializable {
   public void setScheme(Scheme scheme) {
     this.scheme = scheme;
   }
+
+  public String toString() {
+    return String.format("TableInfo: name=%s, headerPageId=%s, scheme=%s", name, headerPageId, scheme);
+  }
 }

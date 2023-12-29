@@ -44,6 +44,7 @@ public final class DatabaseInfo {
    * 
    * @throws IOException if there is an error while loading the database info.
    */
+  @SuppressWarnings("unchecked")
   public void initialize() throws IOException {
     File dbFile = new File(DB_INFO_FILE);
     if (dbFile.exists()) {
@@ -80,9 +81,16 @@ public final class DatabaseInfo {
     try (FileOutputStream fileOut = new FileOutputStream(DB_INFO_FILE);
         ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
       out.writeObject(tableDetailsMap);
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new IOException("Error while saving the database info", e);
     }
+  }
+
+  /**
+   * Clears the database information.
+   */
+  public void clearResourceDetails() {
+    tableDetailsMap.clear();
   }
 
   /**
@@ -104,4 +112,5 @@ public final class DatabaseInfo {
   public int getResourceCount() {
     return tableDetailsMap.size();
   }
+
 }

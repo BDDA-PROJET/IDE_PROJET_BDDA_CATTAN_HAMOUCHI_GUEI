@@ -43,5 +43,8 @@ public class ClearDatabaseOperation implements DatabaseOperation {
 
     // Reset the database
     DBManager.getInstance().clearAll();
+
+    // Print a message to the user
+    System.out.println(" ... done!");
   }
 }

@@ -35,4 +35,9 @@ public class DBParams {
    */
   public static int maxFrameCount;
 
+  /**
+   * Tells whether the records should be displayed or not.
+   */
+  public static boolean displayRecordsValues;
+
 }

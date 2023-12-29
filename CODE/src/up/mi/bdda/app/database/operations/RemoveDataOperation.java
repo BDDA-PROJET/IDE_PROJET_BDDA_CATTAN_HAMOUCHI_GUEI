@@ -48,7 +48,7 @@ public class RemoveDataOperation implements DatabaseOperation {
     resourceName = query.get("RESOURCE");
     if (query.containsKey("WHERE")) {
       String[] conditions = query.get("WHERE").split(" AND ");
-      String[] operators = { "=", "<>", "<=", ">=", "<", ">" };
+      String[] operators = { "<>", "<=", ">=", "<", ">", "=" };
       for (String condition : conditions) {
         for (String operator : operators) {
           if (condition.contains(operator)) {
@@ -70,6 +70,7 @@ public class RemoveDataOperation implements DatabaseOperation {
    *                 ">=", "<", ">").
    * @param value    The value used in the condition.
    */
+  @SuppressWarnings("unchecked")
   private void processWhereCondition(String field, String operator, String value) {
     TableInfo resource = DBManager.getInstance().getDBInfo().getTableDetails(resourceName);
     DataType type = resource.scheme().getField(field).type;
@@ -85,16 +86,16 @@ public class RemoveDataOperation implements DatabaseOperation {
         });
         break;
       case "<":
-        conditions.add(record -> ((Comparable) record.getDataElement(field)).compareTo(parseValue) < 0);
+        conditions.add(record -> ((Comparable<Object>) record.getDataElement(field)).compareTo(parseValue) < 0);
         break;
       case ">":
-        conditions.add(record -> ((Comparable) record.getDataElement(field)).compareTo(parseValue) > 0);
+        conditions.add(record -> ((Comparable<Object>) record.getDataElement(field)).compareTo(parseValue) > 0);
         break;
       case "<=":
-        conditions.add(record -> ((Comparable) record.getDataElement(field)).compareTo(parseValue) <= 0);
+        conditions.add(record -> ((Comparable<Object>) record.getDataElement(field)).compareTo(parseValue) <= 0);
         break;
       case ">=":
-        conditions.add(record -> ((Comparable) record.getDataElement(field)).compareTo(parseValue) >= 0);
+        conditions.add(record -> ((Comparable<Object>) record.getDataElement(field)).compareTo(parseValue) >= 0);
         break;
       case "<>":
         conditions.add(record -> {
@@ -132,6 +133,7 @@ public class RemoveDataOperation implements DatabaseOperation {
       DBFileManager.getInstance().removeRecordFromTable(record);
     }
 
-    System.out.println(String.format("Total deleted records = %d", records.size()));
+    System.out.println();
+    System.out.println(String.format("Total deleted record(s): %d", records.size()));
   }
 }

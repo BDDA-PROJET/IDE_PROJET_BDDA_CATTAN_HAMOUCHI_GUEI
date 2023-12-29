@@ -67,5 +67,8 @@ public class DataImportOperation implements DatabaseOperation {
         DBFileManager.getInstance().addRecordToTable(record);
       }
     }
+
+    // Print a message to the user
+    System.out.println(" ... done!");
   }
 }

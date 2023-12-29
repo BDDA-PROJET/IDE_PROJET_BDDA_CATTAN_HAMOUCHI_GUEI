@@ -35,23 +35,26 @@ public class QueryManager {
     DBParams.pageSize = 4096; // 4KB
     DBParams.maxFileCount = 4;
     DBParams.maxFrameCount = 2;
+    DBParams.displayRecordsValues = true;
 
     List<String> storedQueries = new ArrayList<>();
 
     if (args.length > 0) {
       loadQueriesFromFile(storedQueries, args[0]);
+      DBParams.displayRecordsValues = args.length > 1 && args[1].equals("true");
     } else {
       System.out.println("No file found! It doesn't matter ... : )");
     }
+    System.out.println("!! Welcome to the DBMS !!");
 
     BufferedReader userInputReader = new BufferedReader(new InputStreamReader(System.in));
-
-    System.out.println("!! Welcome to the DBMS !!");
+    System.out.println(":: Please enter all your queries here");
     while (true) {
-      System.out.print(":: Please enter your queries\n-> ");
+      System.out.println(":: Enter `LIST` to see all your queries");
+      System.out.println(":: Enter `ADD <query>` to add a query");
+      System.out.print(":: Enter `START` to execute all your queries at once\n-> ");
       String userQuery = userInputReader.readLine();
-      if (userQuery.equals("EXIT")) {
-        System.out.println("Bye bye!");
+      if (userQuery.equals("START")) {
         break;
       }
       String[] parsedQueries = userQuery.split(" ", 2);
@@ -84,6 +87,7 @@ public class QueryManager {
     }
 
     if (storedQueries.size() == 0) {
+      System.out.println("No queries found!, exiting ...");
       return;
     }
 
@@ -91,11 +95,16 @@ public class QueryManager {
     dbManager.startInitialization();
     for (String query : storedQueries) {
       if (query.equals("EXIT")) {
-        break;
+        System.out.print("Executing query: EXIT");
+        dbManager.endProcess();
+        System.out.println(" ... done!");
+      } else {
+        dbManager.executeQuery(query);
       }
-      dbManager.executeQuery(query);
     }
     dbManager.endProcess();
+
+    System.out.println("\n:: Thank you for using the DBMS!");
   }
 
   /**

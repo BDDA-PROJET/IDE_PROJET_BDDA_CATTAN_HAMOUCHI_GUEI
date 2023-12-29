@@ -22,6 +22,11 @@ public class DBManager {
   private DatabaseInfo dbInfo;
 
   /**
+   * A boolean that indicates whether the database has been initialized or not.
+   */
+  private boolean isInitialized = false;
+
+  /**
    * Private constructor that initializes the dbInfo.
    * It is private to prevent the creation of additional instances of DBManager.
    */
@@ -40,6 +45,7 @@ public class DBManager {
     dbInfo.initialize();
     DiskManager.getInstance().initialize();
     BufferManager.getInstance().initialize();
+    isInitialized = true;
   }
 
   /**
@@ -51,8 +57,10 @@ public class DBManager {
    */
   public void endProcess() throws IOException {
     dbInfo.saveData();
+    dbInfo.clearResourceDetails();
     DiskManager.getInstance().terminate();
     BufferManager.getInstance().complete();
+    isInitialized = false;
   }
 
   /**
@@ -75,10 +83,15 @@ public class DBManager {
    * @throws Exception if there is an error during the execution of the query.
    */
   public void executeQuery(String query) throws Exception {
+    if (!isInitialized) {
+      startInitialization();
+    }
     QueryParser parser = new QueryParser(query);
     Query queryObject = parser.parse();
-    System.out.println(String.format("Executing query: %s", query));
-    queryObject.run();
+    if (queryObject != null) {
+      System.out.print(String.format("Executing query: %s", query));
+      queryObject.run();
+    }
   }
 
   /**
